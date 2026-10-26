@@ -10,7 +10,7 @@ import zipfile
 from pathlib import Path
 
 SOURCE_DIR = Path("downloads")
-OUTPUT_DIR = Path("_site/downloads")
+OUTPUT_DIR = Path("downloads")
 ALIAS_NAME = "latest-extension.zip"
 MANIFEST_NAME = "latest.json"
 
