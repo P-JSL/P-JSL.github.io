@@ -1,0 +1,69 @@
+---
+layout: null
+---
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="My Video App v1.16.0 Chrome 확장 프로그램 다운로드 및 설치 가이드">
+<meta name="theme-color" content="#0c1425">
+<title>My Video App | 다운로드</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1222;--panel:#152238;--line:#314259;--text:#edf6ff;--muted:#aabacf;--accent:#92ebd2;--blue:#81d8f8}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:radial-gradient(ellipse at 85% 0,#213d58,transparent 45%),var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;margin:0}
+a{color:inherit}a:focus-visible{outline:3px solid var(--blue);outline-offset:4px}button{font:inherit}header,main,footer{max-width:1100px;margin:auto;padding-left:25px;padding-right:25px}
+header{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff21}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:17px;font-weight:800}.symbol{background:linear-gradient(130deg,var(--blue),var(--accent));color:#071426;display:grid;place-items:center;width:38px;height:38px;border-radius:11px}.menu{display:flex;gap:19px}.menu a{text-decoration:none;font-size:14px;color:var(--muted)}.menu a:hover{color:var(--text)}
+.hero{padding:95px 0 75px;display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:50px}.tag{display:inline-block;border:1px solid #73d8f68c;border-radius:40px;background:#1b3545;color:#a8efff;font-size:12px;padding:6px 14px;font-weight:700;letter-spacing:.6px}
+h1{font-size:clamp(38px,5.4vw,65px);line-height:1.15;letter-spacing:-2px;margin:22px 0 19px}h1 em{font-style:normal;color:var(--accent)}.intro{color:var(--muted);font-size:17px;max-width:610px}.buttons{display:flex;flex-wrap:wrap;gap:11px;margin:27px 0 14px}
+.button{min-height:49px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:800;text-decoration:none;border:1px solid #ffffff45}
+.primary{background:linear-gradient(100deg,var(--blue),var(--accent));color:#071826;border-color:transparent}.primary:hover{filter:brightness(1.08)}.button.off{color:#a5b5ca;background:#28374a;cursor:not-allowed}.button[hidden]{display:none}.state{font-size:13px;color:var(--muted);min-height:22px}
+.preview{border:1px solid #50708b;background:linear-gradient(140deg,#192e48,#142038);border-radius:23px;padding:22px;box-shadow:0 29px 75px #0006}.browser{border-bottom:1px solid var(--line);font-size:13px;color:#d5ebfa;padding-bottom:16px;display:flex;justify-content:space-between}.lights{letter-spacing:3px;color:#859ab7}.preview-inner{padding:26px 7px}.icon{display:grid;place-items:center;font-size:32px;font-weight:900;width:73px;height:73px;background:linear-gradient(135deg,var(--blue),var(--accent));color:#0a2233;border-radius:18px}.preview h2{margin:18px 0 5px;font-size:26px;line-height:1.3}.preview p{margin:0;color:var(--muted);font-size:14px}.meter{height:9px;border-radius:20px;background:#2b405b;margin-top:22px;overflow:hidden}.meter:after{content:"";display:block;width:76%;height:100%;background:linear-gradient(90deg,var(--blue),var(--accent));border-radius:20px}
+section{padding:35px 0}h2{font-size:29px;letter-spacing:-.8px;line-height:1.3;margin:0 0 10px}.sub{color:var(--muted);margin-top:0;margin-bottom:23px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.tile,.info{border:1px solid var(--line);border-radius:17px;padding:23px;background:#142035c9}.tile strong{display:block;font-size:13px;color:var(--blue)}.tile h3{margin:10px 0 6px;font-size:17px}.tile p{color:var(--muted);font-size:14px;margin:0}.steps{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.step{display:flex;gap:16px;border:1px solid var(--line);border-radius:15px;padding:20px;background:#142035c9}.step b{flex:none;display:grid;place-items:center;width:35px;height:35px;border-radius:10px;color:var(--blue);background:#284058}.step h3{font-size:16px;margin:0 0 5px}.step p{color:var(--muted);font-size:14px;margin:0}code{font-family:Consolas,ui-monospace,monospace;color:#a7f5dd;overflow-wrap:anywhere}
+.info dl{display:grid;grid-template-columns:145px 1fr;gap:11px 18px;margin:0;font-size:14px}.info dt{color:var(--muted)}.info dd{margin:0;overflow-wrap:anywhere}.notice{border-left:3px solid var(--blue);padding-left:15px;color:var(--muted);font-size:14px;margin-top:23px}.fine{font-size:13px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding-top:30px;padding-bottom:40px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:45px}footer a{color:#d4ebfa}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding:60px 0 35px;gap:30px}.preview{max-width:500px}.grid,.steps{grid-template-columns:1fr}.info dl{grid-template-columns:1fr;gap:3px}.info dd{margin-bottom:11px}.menu{gap:11px}.menu a{font-size:12px}h1{letter-spacing:-1.5px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="/"><span class="symbol">M</span>My Video App</a><nav class="menu" aria-label="탐색"><a href="#intro">소개</a><a href="#install">설치 방법</a><a href="#verify">파일 검증</a></nav></header>
+<main>
+<div class="hero"><div>
+<span class="tag">CHROME EXTENSION · v1.16.0</span>
+<h1>미디어를 더 간편하게,<br><em>내 브라우저에서.</em></h1>
+<p class="intro">My Video App은 Chrome 브라우저에서 실행하는 개인용 미디어 관리 확장 프로그램입니다. 설치 파일과 가이드를 확인하세요.</p>
+<div class="buttons"><a class="button primary" id="download" href="/downloads/my-video-app-extension.zip" download="my-video-app-extension.zip" hidden>↓ 확장 프로그램 ZIP 다운로드</a><span class="button off" id="disabled">ZIP 게시 상태 확인 중</span><a class="button" href="#install">설치 안내</a></div>
+<div class="state" id="state" role="status" aria-live="polite">공개 파일의 게시 여부를 확인하고 있습니다.</div>
+</div>
+<div class="preview"><div class="browser"><span class="lights">● ● ●</span>MY VIDEO APP</div><div class="preview-inner"><div class="icon">▶</div><h2>브라우저 안에서<br>미디어 관리</h2><p>Chrome Extension · Manifest V3</p><div class="meter"></div><p style="margin-top:22px">v1.16.0 · Chrome 120+</p></div></div></div>
+<section id="intro"><h2>기능 소개</h2><p class="sub">ZIP을 설치 폴더에 압축 해제하여 확장 프로그램으로 로드할 수 있습니다.</p>
+<div class="grid"><article class="tile"><strong>01 / LOCAL</strong><h3>브라우저 로컬 실행</h3><p>사용자 계정과 구독 없이 동작하도록 제공되는 개인용 확장입니다.</p></article><article class="tile"><strong>02 / MEDIA</strong><h3>미디어 감지와 저장</h3><p>웹페이지의 미디어를 감지하고 다운로드합니다. 실제 지원 여부는 웹사이트에 따라 다릅니다.</p></article><article class="tile"><strong>03 / INTEGRITY</strong><h3>무결성 확인</h3><p>확장 버전, SHA-256과 파일 크기를 제공하여 파일을 검증할 수 있습니다.</p></article></div></section>
+<section id="install"><h2>설치 방법</h2><p class="sub">Chrome 120 이상을 기준으로 작성했습니다.</p><div class="steps">
+<div class="step"><b>1</b><div><h3>ZIP 다운로드</h3><p>ZIP 파일을 내려받아 압축을 해제합니다.</p></div></div>
+<div class="step"><b>2</b><div><h3>확장 관리 열기</h3><p>Chrome 주소창에 <code>chrome://extensions</code>를 입력합니다.</p></div></div>
+<div class="step"><b>3</b><div><h3>개발자 모드 활성화</h3><p>개발자 모드를 켜고 <strong>압축해제된 확장 프로그램을 로드합니다</strong>를 클릭합니다.</p></div></div>
+<div class="step"><b>4</b><div><h3>폴더 선택</h3><p><code>manifest.json</code>이 있는 <code>my-video-app</code> 폴더를 선택합니다. 업데이트 후 확장 프로그램을 새로고침합니다.</p></div></div>
+</div><p class="notice">YouTube 다운로드는 별도의 도우미 ZIP과 Python·Deno 설정이 필요한 기능이 있습니다. 이 확장 ZIP에 도우미는 포함되어 있지 않습니다.</p></section>
+<section id="verify"><h2>파일 검증 정보</h2><p class="sub">사용자 제공 ZIP의 검증된 정보입니다.</p><div class="info"><dl><dt>파일명</dt><dd><code>my-video-app-extension.zip</code></dd><dt>확장 버전</dt><dd>1.16.0</dd><dt>파일 크기</dt><dd>7,562,311 bytes</dd><dt>SHA-256</dt><dd><code>3e1b1b9d84e6c05945fbd4810e594ffe20bd4f2e896710dc636be64fa36667c5</code></dd></dl></div><p class="fine">Windows PowerShell 검사: <code>Get-FileHash .\my-video-app-extension.zip -Algorithm SHA256</code></p><p class="fine">ZIP이 공개 서버에서 확인되지 않으면 다운로드를 활성화하지 않습니다. 비공개 GitHub Release는 일반 방문자가 다운로드할 수 없습니다.</p></section>
+</main>
+<footer><span>© 2026 P-JSL · My Video App</span><span><a href="https://github.com/P-JSL/P-JSL.github.io">GitHub</a> · <a href="https://docs.github.com/ko/pages">GitHub Pages 문서</a></span></footer>
+<script>
+(function(){
+  'use strict';
+  var path='/downloads/my-video-app-extension.zip';
+  var link=document.getElementById('download');
+  var disabled=document.getElementById('disabled');
+  var state=document.getElementById('state');
+  fetch(path,{method:'HEAD',cache:'no-store'}).then(function(response){
+    var size=Number(response.headers.get('content-length'));
+    var type=(response.headers.get('content-type')||'').toLowerCase();
+    if(!response.ok||(size&&size!==7562311)||type.indexOf('text/html')!==-1)throw new Error('File missing');
+    disabled.hidden=true;link.hidden=false;state.textContent='다운로드 가능 · v1.16.0 · 7.21 MiB';
+  }).catch(function(){
+    disabled.textContent='ZIP 파일 배포 준비 중';
+    state.textContent='다운로드 파일이 아직 공개되지 않았습니다. 게시가 완료되면 버튼이 자동으로 활성화됩니다.';
+  });
+}());
+</script>
+</body>
+</html>
