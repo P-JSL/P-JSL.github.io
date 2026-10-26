@@ -29,13 +29,13 @@ footer{border-top:1px solid var(--line);padding-top:30px;padding-bottom:40px;col
 <header><a class="brand" href="/"><span class="symbol">M</span>My Video App</a><nav class="menu" aria-label="탐색"><a href="#intro">소개</a><a href="#install">설치 방법</a><a href="#verify">파일 검증</a></nav></header>
 <main>
 <div class="hero"><div>
-<span class="tag">CHROME EXTENSION · v1.16.0</span>
+<span class="tag" id="release-badge">CHROME EXTENSION · v1.16.0</span>
 <h1>미디어를 더 간편하게,<br><em>내 브라우저에서.</em></h1>
 <p class="intro">My Video App은 Chrome 브라우저에서 실행하는 개인용 미디어 관리 확장 프로그램입니다. 설치 파일과 가이드를 확인하세요.</p>
-<div class="buttons"><a class="button primary" id="download" href="/downloads/my-video-app-extension.zip" download="my-video-app-extension.zip" hidden>↓ 확장 프로그램 ZIP 다운로드</a><span class="button off" id="disabled">ZIP 게시 상태 확인 중</span><a class="button" href="#install">설치 안내</a></div>
+<div class="buttons"><a class="button primary" id="download" href="/downloads/latest-extension.zip" download="my-video-app-extension.zip">↓ 최신 확장 프로그램 ZIP 다운로드</a><a class="button" href="#install">설치 안내</a></div>
 <div class="state" id="state" role="status" aria-live="polite">공개 파일의 게시 여부를 확인하고 있습니다.</div>
 </div>
-<div class="preview"><div class="browser"><span class="lights">● ● ●</span>MY VIDEO APP</div><div class="preview-inner"><div class="icon">▶</div><h2>브라우저 안에서<br>미디어 관리</h2><p>Chrome Extension · Manifest V3</p><div class="meter"></div><p style="margin-top:22px">v1.16.0 · Chrome 120+</p></div></div></div>
+<div class="preview"><div class="browser"><span class="lights">● ● ●</span>MY VIDEO APP</div><div class="preview-inner"><div class="icon">▶</div><h2>브라우저 안에서<br>미디어 관리</h2><p>Chrome Extension · Manifest V3</p><div class="meter"></div><p style="margin-top:22px" id="preview-version">Chrome Extension · Chrome 120+</p></div></div></div>
 <section id="intro"><h2>기능 소개</h2><p class="sub">ZIP을 설치 폴더에 압축 해제하여 확장 프로그램으로 로드할 수 있습니다.</p>
 <div class="grid"><article class="tile"><strong>01 / LOCAL</strong><h3>브라우저 로컬 실행</h3><p>사용자 계정과 구독 없이 동작하도록 제공되는 개인용 확장입니다.</p></article><article class="tile"><strong>02 / MEDIA</strong><h3>미디어 감지와 저장</h3><p>웹페이지의 미디어를 감지하고 다운로드합니다. 실제 지원 여부는 웹사이트에 따라 다릅니다.</p></article><article class="tile"><strong>03 / INTEGRITY</strong><h3>무결성 확인</h3><p>확장 버전, SHA-256과 파일 크기를 제공하여 파일을 검증할 수 있습니다.</p></article></div></section>
 <section id="install"><h2>설치 방법</h2><p class="sub">Chrome 120 이상을 기준으로 작성했습니다.</p><div class="steps">
@@ -44,7 +44,7 @@ footer{border-top:1px solid var(--line);padding-top:30px;padding-bottom:40px;col
 <div class="step"><b>3</b><div><h3>개발자 모드 활성화</h3><p>개발자 모드를 켜고 <strong>압축해제된 확장 프로그램을 로드합니다</strong>를 클릭합니다.</p></div></div>
 <div class="step"><b>4</b><div><h3>폴더 선택</h3><p><code>manifest.json</code>이 있는 <code>my-video-app</code> 폴더를 선택합니다. 업데이트 후 확장 프로그램을 새로고침합니다.</p></div></div>
 </div><p class="notice">YouTube 다운로드는 별도의 도우미 ZIP과 Python·Deno 설정이 필요한 기능이 있습니다. 이 확장 ZIP에 도우미는 포함되어 있지 않습니다.</p></section>
-<section id="verify"><h2>파일 검증 정보</h2><p class="sub">사용자 제공 ZIP의 검증된 정보입니다.</p><div class="info"><dl><dt>파일명</dt><dd><code>my-video-app-extension.zip</code></dd><dt>확장 버전</dt><dd>1.16.0</dd><dt>파일 크기</dt><dd>7,562,311 bytes</dd><dt>SHA-256</dt><dd><code>3e1b1b9d84e6c05945fbd4810e594ffe20bd4f2e896710dc636be64fa36667c5</code></dd></dl></div><p class="fine">Windows PowerShell 검사: <code>Get-FileHash .\my-video-app-extension.zip -Algorithm SHA256</code></p><p class="fine">ZIP이 공개 서버에서 확인되지 않으면 다운로드를 활성화하지 않습니다. 비공개 GitHub Release는 일반 방문자가 다운로드할 수 없습니다.</p></section>
+<section id="verify"><h2>파일 검증 정보</h2><p class="sub">사용자 제공 ZIP의 검증된 정보입니다.</p><div class="info"><dl><dt>파일명</dt><dd><code id="file-name">my-video-app-extension.zip</code></dd><dt>확장 버전</dt><dd id="file-version">조회 중</dd><dt>파일 크기</dt><dd id="file-size">조회 중</dd><dt>SHA-256</dt><dd><code id="file-sha">조회 중</code></dd></dl></div><p class="fine">Windows PowerShell 검사: <code>Get-FileHash .\my-video-app-extension.zip -Algorithm SHA256</code></p><p class="fine">GitHub Actions 배포 시 최신 extension ZIP을 자동으로 선택하고 다운로드 별칭을 갱신합니다. 비공개 GitHub Release의 인증은 필요하지 않습니다.</p></section>
 </main>
 <footer><span>© 2026 P-JSL · My Video App</span><span><a href="https://github.com/P-JSL/P-JSL.github.io">GitHub</a> · <a href="https://docs.github.com/ko/pages">GitHub Pages 문서</a></span></footer>
 <script>
