@@ -49,20 +49,19 @@ footer{border-top:1px solid var(--line);padding-top:30px;padding-bottom:40px;col
 <footer><span>© 2026 P-JSL · My Video App</span><span><a href="https://github.com/P-JSL/P-JSL.github.io">GitHub</a> · <a href="https://docs.github.com/ko/pages">GitHub Pages 문서</a></span></footer>
 <script>
 (function(){
-  'use strict';
-  var path='/downloads/my-video-app-extension.zip';
-  var link=document.getElementById('download');
-  var disabled=document.getElementById('disabled');
-  var state=document.getElementById('state');
-  fetch(path,{method:'HEAD',cache:'no-store'}).then(function(response){
-    var size=Number(response.headers.get('content-length'));
-    var type=(response.headers.get('content-type')||'').toLowerCase();
-    if(!response.ok||(size&&size!==7562311)||type.indexOf('text/html')!==-1)throw new Error('File missing');
-    disabled.hidden=true;link.hidden=false;state.textContent='다운로드 가능 · v1.16.0 · 7.21 MiB';
-  }).catch(function(){
-    disabled.textContent='ZIP 파일 배포 준비 중';
-    state.textContent='다운로드 파일이 아직 공개되지 않았습니다. 게시가 완료되면 버튼이 자동으로 활성화됩니다.';
-  });
+'use strict';
+var state=document.getElementById('state');
+fetch('/downloads/latest.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('Missing metadata');return r.json();}).then(function(d){
+if(!d||!d.filename||!d.version||!d.sha256)throw new Error('Bad metadata');
+document.getElementById('download').setAttribute('download',d.filename);
+document.getElementById('release-badge').textContent='CHROME EXTENSION · v'+d.version.replace(/^v/i,'');
+document.getElementById('preview-version').textContent='v'+d.version.replace(/^v/i,'')+' · Chrome 120+';
+document.getElementById('file-name').textContent=d.filename;
+document.getElementById('file-version').textContent=d.version;
+document.getElementById('file-size').textContent=Number(d.size).toLocaleString('ko-KR')+' bytes';
+document.getElementById('file-sha').textContent=d.sha256;
+state.textContent='최신 버전 '+d.version+' · 다운로드 가능';
+}).catch(function(){state.textContent='버전 정보 조회 실패 · ZIP 다운로드 링크는 이용할 수 있습니다.';});
 }());
 </script>
 </body>
