@@ -22,9 +22,36 @@
   function setBusy(value) {
     busy = value;
     loginButton.disabled = value;
-    uploadButton.disabled = value;
     logoutButton.disabled = value;
     fileInput.disabled = value;
+    updateUploadAvailability();
+  }
+
+  function updateUploadAvailability() {
+    var file = fileInput.files && fileInput.files[0];
+    uploadButton.disabled = busy || !token || !file || file.size === 0 || file.size > MAX_BYTES;
+  }
+
+  function handleFileSelection() {
+    if (busy) return;
+    var file = fileInput.files && fileInput.files[0];
+    progressWrap.hidden = true;
+    if (!file) {
+      setStatus(uploadStatus, 'ZIP 파일을 선택하세요.');
+    } else if (file.size > MAX_BYTES) {
+      setStatus(uploadStatus,
+        '선택한 파일: ' + file.name + ' (' + (file.size / 1048576).toFixed(1) +
+        ' MiB)\\nGit 저장소로 직접 전송하는 관리자 업로드는 25MiB 이하만 가능합니다. ' +
+        '이 파일은 아래 250MB ZIP 업로드의 공개 GitHub Releases 링크로 등록하세요.',
+        false);
+    } else if (file.size === 0) {
+      setStatus(uploadStatus, '빈 파일은 업로드할 수 없습니다.', false);
+    } else {
+      setStatus(uploadStatus,
+        '선택한 ZIP: ' + file.name + ' (' + (file.size / 1048576).toFixed(2) +
+        ' MiB). 파일명에 extension을 넣을 필요는 없습니다.');
+    }
+    updateUploadAvailability();
   }
 
   function setStatus(el, message, success) {
@@ -80,6 +107,7 @@
       uploadPanel.hidden = false;
       document.getElementById('identity').textContent = 'GitHub 관리자 인증: ' + user.login;
       setStatus(uploadStatus, '업로드할 ZIP 파일을 선택하세요.');
+      updateUploadAvailability();
     } catch (error) {
       token = null;
       setStatus(authStatus, error.message, false);
@@ -164,6 +192,7 @@
         '\n커밋: ' + result.commit.sha +
         '\n배포 상태: GitHub Actions에서 확인하세요.', true);
       fileInput.value = '';
+      updateUploadAvailability();
     } catch (error) {
       setStatus(uploadStatus, error.message || '업로드에 실패했습니다.', false);
     } finally { setBusy(false); }
@@ -179,10 +208,13 @@
     document.getElementById('identity').textContent = '';
     setStatus(authStatus, '인증 세션을 종료했습니다.');
     setStatus(uploadStatus, '');
+    updateUploadAvailability();
   }
 
   loginButton.addEventListener('click', authenticate);
   uploadButton.addEventListener('click', upload);
+  fileInput.addEventListener('change', handleFileSelection);
+  updateUploadAvailability();
   logoutButton.addEventListener('click', logout);
   window.addEventListener('pagehide', function () { token = null; });
 })();
