@@ -1,0 +1,61 @@
+---
+layout: null
+---
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src https://api.github.com; img-src 'self' data:; form-action 'none'; base-uri 'none'; object-src 'none'; upgrade-insecure-requests">
+<title>관리자 업로드 | My Video App</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1222;--panel:#17243a;--stroke:#31435b;--fg:#edf5fc;--muted:#a3b5c9;--accent:#86e3cf;--blue:#93dcfa}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 70% 0%,#1c3551,transparent 43%),var(--bg);color:var(--fg);font:15px/1.7 system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif}
+a{color:var(--blue)}.wrap{max-width:840px;margin:auto;padding:24px}.top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--stroke);padding-bottom:20px;margin-bottom:45px}.top a{color:var(--fg);text-decoration:none;font-weight:700}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.25;margin-bottom:11px}h2{font-size:20px;margin:0 0 13px}.lead{font-size:16px;color:var(--muted);margin-bottom:28px}
+.panel{border:1px solid var(--stroke);background:var(--panel);border-radius:17px;padding:25px;margin:19px 0}
+label{display:block;margin-bottom:8px;font-weight:650}input{font:inherit;width:100%;padding:12px 13px;border:1px solid #52657e;background:#0d192b;color:var(--fg);border-radius:9px}input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+button{border:0;border-radius:10px;padding:12px 20px;background:linear-gradient(110deg,var(--blue),var(--accent));font:700 14px system-ui;color:#071526;cursor:pointer;white-space:nowrap}button:disabled{cursor:not-allowed;opacity:.5}
+.actions{display:flex;gap:11px;flex-wrap:wrap;align-items:center;margin-top:17px}.ghost{background:transparent;border:1px solid #647691;color:var(--fg)}small,.small{font-size:13px;color:var(--muted)}p{margin:10px 0}.note{border-left:3px solid var(--blue);padding-left:15px}.danger{color:#ffaeae}.success{color:#99f0cd}
+.status{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;color:var(--muted);margin-top:17px}
+code{font-family:Consolas,ui-monospace,monospace;color:var(--accent);overflow-wrap:anywhere}progress{display:block;width:100%;margin-top:14px;height:11px;accent-color:var(--accent)}
+#upload-panel[hidden],#auth-panel[hidden],#progress-wrap[hidden]{display:none}
+table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border-bottom:1px solid var(--stroke);text-align:left;padding:12px 6px;font-size:13px}th{color:var(--muted);font-weight:650}
+@media(max-width:640px){.panel{padding:18px}.top{margin-bottom:25px}.actions button{flex:1}}
+</style>
+<script src="./app.js" defer></script>
+</head>
+<body><div class="wrap">
+<header class="top"><a href="/">My Video App</a><span class="small">ADMIN · GITHUB</span></header>
+<main>
+<h1>확장 프로그램 파일 관리</h1>
+<p class="lead">권한이 있는 GitHub 계정으로 인증하고 파일을 <code>P-JSL/P-JSL.github.io/downloads/</code>에 직접 업로드합니다.</p>
+<section class="panel" id="auth-panel" aria-labelledby="auth-title">
+<h2 id="auth-title">1. 관리자 인증</h2>
+<label for="token">Fine-grained personal access token</label>
+<input type="password" id="token" autocomplete="off" spellcheck="false" placeholder="github_pat_..." aria-describedby="token-help">
+<p class="small" id="token-help">GitHub에서 <strong>P-JSL.github.io</strong> 저장소만 선택하고 <strong>Contents: Read and write</strong> 권한을 지정한 짧은 유효기간의 토큰을 입력하세요. 인증 확인 후 입력 필드는 비웁니다. 토큰은 서버·브라우저 저장소에 저장하지 않고 GitHub API 호출에만 사용합니다.</p>
+<div class="actions"><button type="button" id="login">GitHub 권한 확인</button><a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">GitHub에서 토큰 관리</a></div>
+<p class="status" id="auth-status" role="status" aria-live="polite"></p>
+</section>
+<section class="panel" id="upload-panel" hidden aria-labelledby="upload-title">
+<h2 id="upload-title">2. ZIP 파일 업로드</h2>
+<p class="success" id="identity"></p>
+<label for="file">브라우저 확장 프로그램 ZIP</label>
+<input type="file" id="file" accept=".zip,application/zip" aria-describedby="size-help">
+<p class="small" id="size-help">이 화면의 직접 Git 업로드는 안정성을 위해 <strong>25MiB 이하</strong>로 제한합니다. 파일명에 <code>extension</code>을 포함하세요. 같은 파일명은 기존 파일을 업데이트하며, GitHub Actions가 가장 최근 커밋된 확장 ZIP을 다운로드 파일로 선택합니다.</p>
+<div class="actions"><button type="button" id="upload">파일 업로드 및 배포 시작</button><button type="button" id="logout" class="ghost">세션 종료</button></div>
+<div id="progress-wrap" hidden><progress id="progress" max="100" value="0"></progress><p id="progress-text" class="small"></p></div>
+<p class="status" id="upload-status" role="status" aria-live="polite"></p>
+<p class="small"><a href="https://github.com/P-JSL/P-JSL.github.io/actions" target="_blank" rel="noopener noreferrer">GitHub Actions 배포 확인</a> · <a href="/downloads/latest-extension.zip" target="_blank" rel="noopener noreferrer">현재 다운로드 파일</a></p>
+</section>
+<section class="panel" aria-labelledby="limit-title">
+<h2 id="limit-title">250MB ZIP 업로드</h2>
+<p><strong>250MB 파일은 이 화면에서 Git 저장소에 직접 업로드할 수 없습니다.</strong> GitHub는 단일 Git 객체 크기를 100MiB로 제한합니다.</p>
+<p>250MB 배포 시 GitHub Releases(파일당 2GiB 미만) 또는 Cloudflare R2/S3와 같은 외부 파일 저장소가 필요합니다. 홈페이지에서 직접 250MB 파일을 업로드하려면 관리자 인증과 대용량 스트리밍을 처리하는 서버리스 API를 추가해야 합니다.</p>
+<p class="note">GitHub Pages 배포 자체는 1GB까지 지원하므로, 별도 저장소에서 Actions 빌드 중 250MB 파일을 가져와 <code>_site/downloads/</code>에 넣는 방식은 가능합니다. 이 별도의 릴리스 연동은 현재 관리자 직접 업로드와 구분됩니다.</p>
+<a href="https://github.com/P-JSL/P-JSL.github.io/releases" target="_blank" rel="noopener noreferrer">GitHub Releases 관리</a>
+</section>
+</main>
+</div></body></html>
