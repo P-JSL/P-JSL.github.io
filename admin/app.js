@@ -88,11 +88,11 @@
 
   function validateFilename(name) {
     if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]*\.zip$/i.test(name) ||
-        !/extension/i.test(name) || name.length > 120) {
-      throw new Error('파일명은 영문·숫자·점·하이픈·언더바만 사용할 수 있으며 extension과 .zip을 포함해야 합니다.');
+        name.length > 120) {
+      throw new Error('ZIP 파일명은 영문·숫자·점·하이픈·언더바를 사용하고 .zip으로 끝나야 합니다.');
     }
-    if (name === 'latest-extension.zip') {
-      throw new Error('latest-extension.zip은 자동 생성용 이름입니다. 다른 파일명을 사용하세요.');
+    if (['latest-extension.zip', 'latest-desktop-windows.zip'].includes(name.toLowerCase())) {
+      throw new Error('latest-*.zip은 자동 생성용 이름입니다. 다른 파일명을 사용하세요.');
     }
   }
 
@@ -143,7 +143,7 @@
       var path = '/repos/' + REPO + '/contents/downloads/' + encodeURIComponent(file.name);
       var oldFile = await github('GET', path);
       var body = {
-        message: 'Upload extension ZIP from authenticated site administrator: ' + file.name,
+        message: 'Upload ZIP from authenticated site administrator: ' + file.name,
         branch: 'main',
         content: encoded
       };
