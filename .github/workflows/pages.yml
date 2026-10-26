@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'admin/**'
       - '_config.yml'
       - 'downloads/**'
       - '.github/workflows/pages.yml'
