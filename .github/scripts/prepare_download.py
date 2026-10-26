@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish the most recently committed browser extension ZIP on GitHub Pages."""
+"""Prepare independent browser-extension and Windows desktop ZIP downloads for Pages."""
 
 import hashlib
 import json
@@ -7,88 +7,119 @@ import shutil
 import subprocess
 import sys
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 SOURCE_DIR = Path("downloads")
-OUTPUT_DIR = Path("downloads")
-ALIAS_NAME = "latest-extension.zip"
-MANIFEST_NAME = "latest.json"
+DESTINATIONS = {
+    "extension": ("latest-extension.zip", "latest.json"),
+    "desktop-windows": ("latest-desktop-windows.zip", "latest-desktop.json"),
+}
+GENERATED_NAMES = {name for pair in DESTINATIONS.values() for name in pair}
 
 
-def latest_commit_epoch(path):
-    """Return the timestamp of the most recent commit touching a tracked file."""
+def last_commit_time(path):
+    """Rank ZIPs by their most recent source-file commit, not filesystem time."""
     value = subprocess.check_output(
         ["git", "log", "-1", "--format=%ct", "--", str(path)],
         text=True,
     ).strip()
     if not value:
-        raise RuntimeError("Git history is missing for " + str(path))
+        raise ValueError("File has no tracked commit: " + str(path))
     return int(value)
 
 
-def select_latest_zip():
-    """Only consider ZIP files explicitly named as browser extensions."""
-    candidates = [
-        path for path in SOURCE_DIR.iterdir()
-        if path.is_file()
-        and path.suffix.lower() == ".zip"
-        and "extension" in path.stem.lower()
-        and path.name != ALIAS_NAME
-    ]
-    if not candidates:
-        raise RuntimeError("No extension ZIP found under downloads/")
-    return max(candidates, key=lambda p: (latest_commit_epoch(p), p.name.lower()))
-
-
-def read_extension_version(path):
-    """Read version from the packaged extension manifest, without extracting files."""
+def inspect_zip(path):
+    """Identify the package by its content; the uploaded filename is unrestricted."""
     with zipfile.ZipFile(path) as archive:
-        damaged = archive.testzip()
-        if damaged:
-            raise RuntimeError("Invalid ZIP entry: " + damaged)
-        names = [
-            name for name in archive.namelist()
+        infos = archive.infolist()
+        if not infos:
+            raise ValueError("Empty ZIP: " + str(path))
+        names = set()
+        for item in infos:
+            name = item.filename
+            parsed = PurePosixPath(name)
+            if (name in names or parsed.is_absolute() or ".." in parsed.parts
+                    or "\\" in name or item.flag_bits & 1):
+                raise ValueError("Unsafe ZIP entry in " + str(path))
+            names.add(name)
+
+        # A desktop bundle can include browser-related files; executable takes priority.
+        if any(name.lower().endswith(".exe") and not name.endswith("/") for name in names):
+            return "desktop-windows", None
+
+        manifest_names = [
+            name for name in names
             if name == "manifest.json" or name.endswith("/manifest.json")
         ]
-        if not names:
-            raise RuntimeError("Extension ZIP is missing manifest.json")
-        name = sorted(names, key=lambda s: (s.count("/"), len(s)))[0]
-        manifest = json.loads(archive.read(name))
-        if not isinstance(manifest, dict) or not isinstance(manifest.get("version"), str):
-            raise RuntimeError("Extension ZIP contains an invalid manifest version")
-        if not manifest.get("manifest_version"):
-            raise RuntimeError("Extension ZIP contains an invalid browser extension manifest")
-        return manifest["version"]
+        for name in sorted(manifest_names, key=lambda s: (s.count("/"), len(s))):
+            info = archive.getinfo(name)
+            if info.file_size > 1024 * 1024:
+                continue
+            try:
+                manifest = json.loads(archive.read(name))
+            except (ValueError, UnicodeDecodeError):
+                continue
+            if (isinstance(manifest, dict)
+                    and isinstance(manifest.get("manifest_version"), int)
+                    and isinstance(manifest.get("version"), str)
+                    and manifest.get("version")):
+                return "extension", manifest["version"]
+        return None, None
+
+
+def publish_zip(category, path, version):
+    """Create an immutable build artifact alias and independent metadata."""
+    alias, metadata_name = DESTINATIONS[category]
+    destination = SOURCE_DIR / alias
+    shutil.copyfile(path, destination)
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    with destination.open("rb") as stream:
+        published_digest = hashlib.file_digest(stream, "sha256").hexdigest()
+    if digest != published_digest:
+        raise ValueError("Published ZIP SHA-256 verification failed: " + str(path))
+    metadata = {
+        "kind": category,
+        "filename": path.name,
+        "version": version,
+        "size": path.stat().st_size,
+        "sha256": digest,
+        "url": "/downloads/" + alias,
+    }
+    (SOURCE_DIR / metadata_name).write_text(
+        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print("Published:", category, path.name, metadata["size"], digest)
 
 
 def main():
-    source = select_latest_zip()
-    version = read_extension_version(source)
-    digest = hashlib.sha256(source.read_bytes()).hexdigest()
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    destination = OUTPUT_DIR / ALIAS_NAME
-    shutil.copyfile(source, destination)
-    data = {
-        "filename": source.name,
-        "version": version,
-        "size": source.stat().st_size,
-        "sha256": digest,
-        "url": "/downloads/" + ALIAS_NAME,
-    }
-    (OUTPUT_DIR / MANIFEST_NAME).write_text(
-        json.dumps(data, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    if hashlib.sha256(destination.read_bytes()).hexdigest() != digest:
-        raise RuntimeError("Published ZIP failed checksum verification")
-    print("Pages ZIP: {} (version {}, size {}, sha256 {})".format(
-        source, version, data["size"], digest
-    ))
+    catalog = {}
+    for path in sorted(SOURCE_DIR.iterdir()):
+        if not path.is_file() or path.suffix.lower() != ".zip":
+            continue
+        if path.name in GENERATED_NAMES:
+            continue
+        category, version = inspect_zip(path)
+        if category is None:
+            print("Skipped unknown ZIP type:", path.name)
+            continue
+        candidate = (last_commit_time(path), path.name.lower(), path, version)
+        if category not in catalog or candidate[:2] > catalog[category][:2]:
+            catalog[category] = candidate
+
+    if "extension" not in catalog:
+        raise ValueError("No valid browser extension ZIP in downloads/")
+    for category in DESTINATIONS:
+        if category in catalog:
+            _, _, path, version = catalog[category]
+            publish_zip(category, path, version)
+        else:
+            print("No locally tracked", category, "ZIP; public Release lookup is available for desktop.")
 
 
 if __name__ == "__main__":
     try:
         main()
-    except Exception as exc:
-        print("Extension ZIP publish failed:", exc, file=sys.stderr)
+    except (OSError, ValueError, zipfile.BadZipFile, subprocess.CalledProcessError) as exc:
+        print("Download catalog preparation failed:", exc, file=sys.stderr)
         sys.exit(1)
