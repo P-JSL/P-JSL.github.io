@@ -27,12 +27,12 @@ jobs:
         with:
           fetch-depth: 0
       - uses: actions/configure-pages@v5
+      - name: Publish latest extension ZIP
+        run: python3 .github/scripts/prepare_download.py
       - uses: actions/jekyll-build-pages@v1
         with:
           source: ./
           destination: ./_site
-      - name: Publish latest extension ZIP
-        run: python3 .github/scripts/prepare_download.py
       - uses: actions/upload-pages-artifact@v4
         with:
           path: ./_site
