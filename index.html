@@ -26,16 +26,28 @@ footer{border-top:1px solid var(--line);padding-top:30px;padding-bottom:40px;col
 </style>
 </head>
 <body>
-<header><a class="brand" href="/"><span class="symbol">M</span>My Video App</a><nav class="menu" aria-label="탐색"><a href="#intro">소개</a><a href="#install">설치 방법</a><a href="#verify">파일 검증</a><a href="/admin/" title="관리자 파일 업로드">관리자</a></nav></header>
+<header><a class="brand" href="/"><span class="symbol">M</span>My Video App</a><nav class="menu" aria-label="탐색"><a href="#downloads">다운로드</a><a href="#intro">소개</a><a href="#install">설치 방법</a><a href="#verify">파일 검증</a><a href="/admin/" title="관리자 파일 업로드">관리자</a></nav></header>
 <main>
 <div class="hero"><div>
 <span class="tag" id="release-badge">CHROME EXTENSION · v1.16.0</span>
 <h1>미디어를 더 간편하게,<br><em>내 브라우저에서.</em></h1>
-<p class="intro">My Video App은 Chrome 브라우저에서 실행하는 개인용 미디어 관리 확장 프로그램입니다. 설치 파일과 가이드를 확인하세요.</p>
+<p class="intro">My Video App의 Chrome 확장 프로그램과 Windows 데스크톱 프로그램을 각각 다운로드할 수 있습니다.</p>
 <div class="buttons"><a class="button primary" id="download" href="/downloads/latest-extension.zip" download="my-video-app-extension.zip">↓ 최신 확장 프로그램 ZIP 다운로드</a><a class="button" href="#install">설치 안내</a></div>
 <div class="state" id="state" role="status" aria-live="polite">공개 파일의 게시 여부를 확인하고 있습니다.</div>
 </div>
 <div class="preview"><div class="browser"><span class="lights">● ● ●</span>MY VIDEO APP</div><div class="preview-inner"><div class="icon">▶</div><h2>브라우저 안에서<br>미디어 관리</h2><p>Chrome Extension · Manifest V3</p><div class="meter"></div><p style="margin-top:22px" id="preview-version">Chrome Extension · Chrome 120+</p></div></div></div>
+<section id="downloads" aria-labelledby="downloads-title">
+<h2 id="downloads-title">다운로드 선택</h2>
+<p class="sub">브라우저 확장 프로그램과 Windows 데스크톱 버전을 별도로 제공합니다.</p>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))">
+<article class="tile"><strong>CHROME / EXTENSION</strong><h3>브라우저 확장 프로그램</h3>
+<p id="extension-desc">최신 Chrome 확장 프로그램 ZIP</p>
+<div class="buttons"><a class="button primary" id="extension-card-download" href="/downloads/latest-extension.zip" download>확장 프로그램 다운로드</a></div>
+</article>
+<article class="tile"><strong>WINDOWS / DESKTOP</strong><h3>Windows 데스크톱</h3>
+<p id="desktop-desc">Windows x64 ZIP은 공개 릴리스에서 제공합니다.</p>
+<div class="buttons"><a class="button" id="desktop-download" href="https://github.com/P-JSL/P-JSL.github.io/releases" rel="noopener noreferrer" aria-disabled="true">데스크톱 배포 준비 중</a></div>
+</article></div></section>
 <section id="intro"><h2>기능 소개</h2><p class="sub">ZIP을 설치 폴더에 압축 해제하여 확장 프로그램으로 로드할 수 있습니다.</p>
 <div class="grid"><article class="tile"><strong>01 / LOCAL</strong><h3>브라우저 로컬 실행</h3><p>사용자 계정과 구독 없이 동작하도록 제공되는 개인용 확장입니다.</p></article><article class="tile"><strong>02 / MEDIA</strong><h3>미디어 감지와 저장</h3><p>웹페이지의 미디어를 감지하고 다운로드합니다. 실제 지원 여부는 웹사이트에 따라 다릅니다.</p></article><article class="tile"><strong>03 / INTEGRITY</strong><h3>무결성 확인</h3><p>확장 버전, SHA-256과 파일 크기를 제공하여 파일을 검증할 수 있습니다.</p></article></div></section>
 <section id="install"><h2>설치 방법</h2><p class="sub">Chrome 120 이상을 기준으로 작성했습니다.</p><div class="steps">
@@ -62,6 +74,44 @@ document.getElementById('file-size').textContent=Number(d.size).toLocaleString('
 document.getElementById('file-sha').textContent=d.sha256;
 state.textContent='최신 버전 '+d.version+' · 다운로드 가능';
 }).catch(function(){state.textContent='버전 정보 조회 실패 · ZIP 다운로드 링크는 이용할 수 있습니다.';});
+}());
+
+(function(){
+'use strict';
+var button=document.getElementById('desktop-download');
+var description=document.getElementById('desktop-desc');
+var namePattern=/desktop[-_ ]windows|windows[-_ ](?:x64|desktop)|desktop.*\\.zip/i;
+function attach(asset,version){
+button.href=asset.browser_download_url||asset.url;
+button.textContent='Windows x64 ZIP 다운로드';
+button.setAttribute('download',asset.name||'');
+button.removeAttribute('aria-disabled');
+description.textContent=(version?version+' · ':'')+(asset.size?(asset.size/1048576).toFixed(1)+' MiB':'')+' · '+asset.name;
+}
+fetch('/downloads/latest-desktop.json',{cache:'no-store'}).then(function(response){
+if(!response.ok)throw new Error('no local desktop file');
+return response.json();
+}).then(function(data){
+if(!data||!data.url||!data.filename||!data.sha256)throw new Error('invalid desktop metadata');
+attach({url:data.url,name:data.filename,size:data.size},data.version);
+}).catch(function(){
+fetch('https://api.github.com/repos/P-JSL/P-JSL.github.io/releases?per_page=20',{headers:{'Accept':'application/vnd.github+json'}})
+.then(function(r){if(!r.ok)throw new Error('release lookup failed');return r.json();})
+.then(function(releases){
+var found=null;
+for(var i=0;i<releases.length;i++){
+var rel=releases[i];
+if(rel.draft||rel.prerelease)continue;
+var assets=rel.assets||[];
+for(var j=0;j<assets.length;j++){
+var a=assets[j];if(namePattern.test(a.name)&&a.state==='uploaded'){found={asset:a,version:rel.tag_name};break;}
+}
+if(found)break;
+}
+if(found)attach(found.asset,found.version);
+else description.textContent='공개 저장소의 Windows ZIP Release가 아직 없습니다. 관리자 업로드 안내를 확인하세요.';
+}).catch(function(){description.textContent='데스크톱 다운로드 정보를 확인하지 못했습니다.';});
+});
 }());
 </script>
 </body>
