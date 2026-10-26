@@ -36,8 +36,7 @@
     if (!token) throw new Error('먼저 관리자로 인증하세요.');
     var headers = {
       'Accept': 'application/vnd.github+json',
-      'Authorization': 'Bearer ' + token,
-      'X-GitHub-Api-Version': '2022-11-28'
+      'Authorization': 'Bearer ' + token
     };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     var response;
