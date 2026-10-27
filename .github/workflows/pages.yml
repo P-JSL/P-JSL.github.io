@@ -5,6 +5,10 @@ on:
     paths:
       - 'index.html'
       - 'admin/**'
+      - 'pages/**'
+      - 'assets/site-pages.js'
+      - 'assets/site-pages.css'
+      - 'site-pages.json'
       - '_config.yml'
       - 'downloads/**'
       - '.github/workflows/pages.yml'
