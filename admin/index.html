@@ -8,9 +8,9 @@ layout: null
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' https: data:; form-action 'none'; base-uri 'none'; object-src 'none'">
 <title>P-JSL Studio | 관리자</title>
-<link rel="stylesheet" href="/admin/studio.css?v=2">
-<script src="/assets/site-pages.js?v=2" defer></script>
-<script src="/admin/studio.js?v=2" defer></script>
+<link rel="stylesheet" href="/admin/studio.css?v=3">
+<script src="/assets/site-pages.js?v=3" defer></script>
+<script src="/admin/studio.js?v=3" defer></script>
 </head>
 <body>
 <div class="shell">
@@ -35,9 +35,9 @@ layout: null
 <div class="designer">
 <aside class="sidebar">
 <div class="aside-header"><h2>메뉴 구성</h2><button id="add-page" class="small-primary">+ 추가</button></div>
-<div class="fixed-page"><span class="dot"></span><span>Video App Download</span><span class="tag">기본</span></div>
+<button type="button" class="fixed-page" id="home-page-button">Video App Download · 기본 홈</button>
 <div id="page-list" class="page-list" aria-label="관리할 페이지 목록"></div>
-<p class="muted tiny">기본 메뉴는 삭제되지 않습니다. 다른 메뉴는 선택 후 순서와 공개 여부를 수정할 수 있습니다.</p>
+<p class="muted tiny">기본 홈도 클릭하여 화면 구성과 메뉴명을 수정할 수 있습니다. 홈 삭제와 주소 변경만 제한됩니다.</p>
 <div class="divider"></div>
 <h2>템플릿</h2>
 <div class="templates" id="templates">
