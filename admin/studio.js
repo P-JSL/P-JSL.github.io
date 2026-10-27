@@ -46,14 +46,14 @@ var p=page();$('editor').hidden=!p;$('empty-state').hidden=!!p;if(!p){renderPrev
 $('page-title-input').value=p.title;$('page-slug').value=p.slug;$('page-summary-input').value=p.summary;$('page-visible').checked=p.visible;$('page-slug').disabled=current===-2;$('page-visible').disabled=current===-2;$('delete-page').disabled=current===-2;$('move-page-up').disabled=current===-2;$('move-page-down').disabled=current===-2;
 renderCanvas();drawInspector();renderPreview();
 }
-var TYPES=[['downloads','자동 다운로드'],['hero','히어로'],['heading','제목'],['text','텍스트'],['image','이미지'],['button','버튼'],['cards','카드'],['list','목록'],['notice','안내'],['divider','구분선'],['spacer','여백']];
+var TYPES=[['downloads','기본 다운로드'],['download','파일 다운로드'],['hero','히어로'],['heading','제목'],['text','텍스트'],['image','이미지'],['button','버튼'],['cards','카드'],['list','목록'],['notice','안내'],['divider','구분선'],['spacer','여백']];
 var templates={
 blank:[],
 landing:[['hero','새로운 페이지','원하는 내용을 소개하세요.'],['cards','핵심 기능',''],['button','','']],
 news:[['heading','공지사항',''],['notice','최신 소식','변경 사항을 안내하세요.'],['text','상세 내용','내용을 입력하세요.']],
 products:[['hero','프로젝트 소개','프로젝트를 확인하세요.'],['cards','프로젝트',''],['button','','']]
 };
-function block(type,title,text){return {id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),type:type,title:title||'',text:text||'',url:'',label:'',alt:'',caption:'',align:'left',items:type==='cards'?[{title:'항목 1',text:'설명'},{title:'항목 2',text:'설명'}]:[]};}
+function block(type,title,text){return {id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),type:type,title:title||'',text:text||'',url:'',label:'',alt:'',caption:'',align:'left',width:12,variant:'plain',source:'folder',filename:'',releaseTag:'latest',items:type==='cards'?[{title:'항목 1',text:'설명'},{title:'항목 2',text:'설명'}]:[]};}
 function add(type,index){if(!page())return msg('먼저 페이지를 선택하세요.',true);if(page().blocks.length>=60)return msg('블록은 최대 60개입니다.',true);var b=block(type);page().blocks.splice(index===undefined?page().blocks.length:index,0,b);activeBlock=page().blocks.indexOf(b);change();renderCanvas();drawInspector();renderPreview();}
 function renderCanvas(){
 var host=$('canvas');host.replaceChildren();if(!page())return;
@@ -83,12 +83,25 @@ function drawInspector(){
 var host=$('inspector-fields');host.replaceChildren();var b=page()&&page().blocks[activeBlock];$('inspector-empty').hidden=!!b;$('inspector-actions').hidden=!b;if(!b)return;
 function field(title,key,multi){inputField(host,title,b[key],function(v){b[key]=v;},multi);}
 if(!['divider','spacer','button','image'].includes(b.type))field('제목','title');
-if(['hero','text','notice','downloads'].includes(b.type))field('설명·본문','text',true);
+if(['hero','text','notice','downloads','download'].includes(b.type))field('설명·본문','text',true);
+if(b.type==='download'){
+var sourceLabel=label('label','다운로드 저장 위치');var sourceSelect=document.createElement('select');
+[['folder','내부 downloads 폴더'],['release','GitHub 공개 Release']].forEach(function(x){var o=label('option',x[1]);o.value=x[0];sourceSelect.appendChild(o);});
+sourceSelect.value=b.source||'folder';sourceSelect.onchange=function(){b.source=sourceSelect.value;change();drawInspector();renderPreview();renderCanvas();};host.appendChild(sourceLabel);host.appendChild(sourceSelect);
+field('파일명 (.zip 포함)','filename');field('다운로드 버튼 텍스트','label');
+if(b.source==='release')field('Release 태그 (latest 또는 desktop_v1.18)','releaseTag');
+}
 if(['image','button'].includes(b.type))field('링크 URL (https 또는 / 내부경로)','url');
 if(b.type==='image'){field('대체 텍스트','alt');field('캡션','caption');}
 if(b.type==='button')field('버튼 이름','label');
 if(['cards','list'].includes(b.type)){
 var l=label('label','항목 (한 줄당 제목 | 설명, 최대 12개)');var ta=document.createElement('textarea');ta.value=(b.items||[]).map(function(x){return x.title+' | '+x.text;}).join('\n');ta.oninput=function(){b.items=ta.value.split('\n').filter(Boolean).slice(0,12).map(function(line){var n=line.indexOf('|');return {title:(n<0?line:line.slice(0,n)).trim().slice(0,100),text:(n<0?'':line.slice(n+1)).trim().slice(0,750)};});change();renderPreview();renderCanvas();};host.appendChild(l);host.appendChild(ta);
+}
+if(true){
+var wl=label('label','너비 / 12열 그리드');var ws=document.createElement('select');
+[[12,'전체 (12/12)'],[8,'넓게 (8/12)'],[6,'절반 (6/12)'],[4,'1/3 (4/12)']].forEach(function(x){var o=label('option',x[1]);o.value=x[0];ws.appendChild(o);});
+ws.value=String(b.width||12);ws.onchange=function(){b.width=Number(ws.value);change();renderPreview();renderCanvas();};host.appendChild(wl);host.appendChild(ws);
+var vl=label('label','블록 스타일');var vs=document.createElement('select');[['plain','기본'],['panel','패널'],['accent','강조']].forEach(function(x){var o=label('option',x[1]);o.value=x[0];vs.appendChild(o);});vs.value=b.variant||'plain';vs.onchange=function(){b.variant=vs.value;change();renderPreview();renderCanvas();};host.appendChild(vl);host.appendChild(vs);
 }
 if(!['divider','spacer','downloads'].includes(b.type)){var l=label('label','정렬');var sel=document.createElement('select');['left','center'].forEach(function(v){var o=label('option',v==='left'?'왼쪽':'가운데');o.value=v;sel.appendChild(o);});sel.value=b.align||'left';sel.onchange=function(){b.align=sel.value;change();renderPreview();renderCanvas();};host.appendChild(l);host.appendChild(sel);}
 }
