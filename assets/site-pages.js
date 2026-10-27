@@ -3,165 +3,250 @@
 
   var DATA_URL = '/site-pages.json';
   var VALID_SLUG = /^[a-z][a-z0-9-]{1,49}$/;
+  var BLOCK_TYPES = ['hero', 'heading', 'text', 'image', 'button', 'cards', 'list', 'notice', 'divider', 'spacer'];
   var MAX_PAGES = 100;
+  var MAX_BLOCKS = 60;
 
   function validLink(url) {
-    if (typeof url !== 'string' || !url || url.length > 1000) return false;
-    if (url[0] === '/' && url[1] !== '/' && !url.includes('\\')) return true;
+    if (typeof url !== 'string' || !url || url.length > 1200 ||
+        /[\u0000-\u001f\u007f]/.test(url) || url.indexOf('\\') !== -1) return false;
+    if (url[0] === '/' && url[1] !== '/') return true;
     try {
       var parsed = new URL(url);
-      return parsed.protocol === 'https:';
+      return parsed.protocol === 'https:' && !!parsed.hostname && !parsed.username && !parsed.password;
     } catch (_) { return false; }
   }
 
-  function validPage(item) {
-    return item && typeof item === 'object' &&
-      typeof item.slug === 'string' && VALID_SLUG.test(item.slug) &&
-      typeof item.title === 'string' && item.title.trim().length > 0 &&
-      item.title.length <= 60 &&
-      typeof item.summary === 'string' && item.summary.length <= 240 &&
-      typeof item.content === 'string' && item.content.length <= 30000 &&
-      typeof item.visible === 'boolean' &&
-      typeof item.linkLabel === 'string' && item.linkLabel.length <= 60 &&
-      typeof item.linkUrl === 'string' &&
-      (!item.linkLabel || validLink(item.linkUrl));
+  function validBlock(block) {
+    if (!block || typeof block !== 'object' || !BLOCK_TYPES.includes(block.type) ||
+        typeof block.id !== 'string' || !/^[a-zA-Z0-9_-]{1,70}$/.test(block.id)) return false;
+    if (block.title !== undefined && (typeof block.title !== 'string' || block.title.length > 160)) return false;
+    if (block.text !== undefined && (typeof block.text !== 'string' || block.text.length > 12000)) return false;
+    if (block.url !== undefined && (typeof block.url !== 'string' || (block.url && !validLink(block.url)))) return false;
+    if (block.label !== undefined && (typeof block.label !== 'string' || block.label.length > 100)) return false;
+    if (block.alt !== undefined && (typeof block.alt !== 'string' || block.alt.length > 180)) return false;
+    if (block.caption !== undefined && (typeof block.caption !== 'string' || block.caption.length > 250)) return false;
+    if (block.align !== undefined && !['left', 'center'].includes(block.align)) return false;
+    if (block.items !== undefined && (!Array.isArray(block.items) || block.items.length > 12 ||
+        block.items.some(function (item) {
+          return !item || typeof item !== 'object' || typeof item.title !== 'string' ||
+            item.title.length > 100 || typeof item.text !== 'string' || item.text.length > 750;
+        }))) return false;
+    if (block.type === 'image' && (!block.url || !validLink(block.url))) return false;
+    if (block.type === 'button' && (!block.url || !validLink(block.url))) return false;
+    return true;
+  }
+
+  function validPage(page) {
+    if (!page || typeof page !== 'object' || typeof page.slug !== 'string' ||
+        !VALID_SLUG.test(page.slug) || typeof page.title !== 'string' ||
+        !page.title.trim() || page.title.length > 60 ||
+        typeof page.summary !== 'string' || page.summary.length > 240 ||
+        typeof page.visible !== 'boolean') return false;
+    if (page.content !== undefined && (typeof page.content !== 'string' || page.content.length > 30000)) return false;
+    if (page.linkLabel !== undefined && (typeof page.linkLabel !== 'string' || page.linkLabel.length > 60)) return false;
+    if (page.linkUrl !== undefined && (typeof page.linkUrl !== 'string' || (page.linkUrl && !validLink(page.linkUrl)))) return false;
+    if (page.linkLabel && !page.linkUrl) return false;
+    if (page.blocks !== undefined) {
+      if (!Array.isArray(page.blocks) || page.blocks.length > MAX_BLOCKS || !page.blocks.every(validBlock)) return false;
+      var ids = new Set();
+      for (var i = 0; i < page.blocks.length; i++) {
+        if (ids.has(page.blocks[i].id)) return false;
+        ids.add(page.blocks[i].id);
+      }
+    }
+    return true;
   }
 
   function sanitizeRegistry(data) {
     if (!data || data.schema !== 1 || !Array.isArray(data.pages) ||
-        data.pages.length > MAX_PAGES) {
-      throw new Error('메뉴 데이터 형식이 올바르지 않습니다.');
-    }
+        data.pages.length > MAX_PAGES) throw new Error('메뉴 데이터 형식이 올바르지 않습니다.');
     var seen = new Set();
-    return data.pages.filter(function (item) {
-      if (!validPage(item) || seen.has(item.slug)) return false;
-      seen.add(item.slug);
+    return data.pages.filter(function (page) {
+      if (!validPage(page) || seen.has(page.slug)) return false;
+      seen.add(page.slug);
       return true;
     });
   }
 
-  function loadPages() {
-    return fetch(DATA_URL, { cache: 'no-store', credentials: 'omit' })
-      .then(function (response) {
-        if (!response.ok) throw new Error('메뉴 데이터를 불러올 수 없습니다.');
-        return response.json();
-      })
-      .then(sanitizeRegistry);
+  function el(tag, className, value) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (value !== undefined) node.textContent = value;
+    return node;
   }
 
-  function buildNav(element, pages, currentSlug) {
-    pages.forEach(function (page) {
-      if (!page.visible) return;
-      var a = document.createElement('a');
-      a.href = '/pages/?slug=' + encodeURIComponent(page.slug);
-      a.textContent = page.title;
-      if (currentSlug === page.slug) a.setAttribute('aria-current', 'page');
-      element.appendChild(a);
-    });
+  function appendLink(host, url, label, className) {
+    if (!label || !validLink(url)) return;
+    var a = el('a', className, label);
+    a.href = url;
+    if (url.indexOf('https://') === 0) {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    }
+    host.appendChild(a);
   }
 
   function renderContent(host, content) {
     host.replaceChildren();
-    var lines = content.replace(/\r\n?/g, '\n').split('\n');
-    var paragraph = [];
+    var lines = String(content || '').replace(/\r\n?/g, '\n').split('\n');
+    var pending = [];
     var list = null;
-
-    function flushParagraph() {
-      if (!paragraph.length) return;
-      var p = document.createElement('p');
-      p.textContent = paragraph.join('\n');
-      host.appendChild(p);
-      paragraph = [];
+    function flush() {
+      if (!pending.length) return;
+      host.appendChild(el('p', '', pending.join('\n')));
+      pending = [];
     }
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (!line) {
-        flushParagraph();
-        list = null;
-        continue;
-      }
+    lines.forEach(function (raw) {
+      var line = raw.trim();
+      if (!line) { flush(); list = null; return; }
       var heading = line.match(/^(#{1,3})\s+(.+)$/);
       var bullet = line.match(/^[-*]\s+(.+)$/);
       if (heading) {
-        flushParagraph();
-        list = null;
-        var h = document.createElement(heading[1].length === 1 ? 'h2' :
-          heading[1].length === 2 ? 'h3' : 'h4');
-        h.textContent = heading[2];
-        host.appendChild(h);
+        flush(); list = null;
+        host.appendChild(el(heading[1].length === 1 ? 'h2' : 'h3', '', heading[2]));
       } else if (bullet) {
-        flushParagraph();
-        if (!list) {
-          list = document.createElement('ul');
-          host.appendChild(list);
-        }
-        var item = document.createElement('li');
-        item.textContent = bullet[1];
-        list.appendChild(item);
-      } else {
-        list = null;
-        paragraph.push(line);
-      }
+        flush();
+        if (!list) { list = el('ul'); host.appendChild(list); }
+        list.appendChild(el('li', '', bullet[1]));
+      } else { list = null; pending.push(line); }
+    });
+    flush();
+  }
+
+  function renderBlock(block) {
+    var box = el('section', 'site-block site-block-' + block.type);
+    if (block.align === 'center') box.classList.add('centered');
+    var title = block.title || '';
+    var text = block.text || '';
+    if (block.type === 'divider') {
+      box.appendChild(el('hr')); return box;
     }
-    flushParagraph();
+    if (block.type === 'spacer') return box;
+    if (block.type === 'image') {
+      var img = el('img', 'site-content-image');
+      img.loading = 'lazy'; img.decoding = 'async'; img.alt = block.alt || title || '페이지 이미지';
+      img.referrerPolicy = 'no-referrer'; img.src = block.url;
+      box.appendChild(img);
+      if (block.caption) box.appendChild(el('p', 'image-caption', block.caption));
+      return box;
+    }
+    if (block.type === 'cards') {
+      if (title) box.appendChild(el('h2', '', title));
+      var grid = el('div', 'site-card-grid');
+      (block.items || []).forEach(function (item) {
+        var card = el('article', 'site-content-card');
+        card.appendChild(el('h3', '', item.title));
+        card.appendChild(el('p', '', item.text));
+        grid.appendChild(card);
+      });
+      box.appendChild(grid); return box;
+    }
+    if (block.type === 'list') {
+      if (title) box.appendChild(el('h2', '', title));
+      var ul = el('ul');
+      (block.items || []).forEach(function (item) {
+        var li = el('li');
+        if (item.title) li.appendChild(el('strong', '', item.title + (item.text ? ' — ' : '')));
+        if (item.text) li.appendChild(document.createTextNode(item.text));
+        ul.appendChild(li);
+      });
+      box.appendChild(ul); return box;
+    }
+    if (block.type === 'heading') { box.appendChild(el('h2', '', title)); return box; }
+    if (block.type === 'hero' || block.type === 'notice') {
+      if (title) box.appendChild(el('h2', '', title));
+      if (text) box.appendChild(el('p', '', text));
+      return box;
+    }
+    if (block.type === 'button') {
+      appendLink(box, block.url, block.label || '자세히 보기', 'site-block-button'); return box;
+    }
+    if (block.type === 'text') {
+      if (title) box.appendChild(el('h2', '', title));
+      renderContent(box, text);
+    }
+    return box;
+  }
+
+  function renderBlocks(host, blocks) {
+    host.replaceChildren();
+    blocks.forEach(function (block) {
+      if (validBlock(block)) host.appendChild(renderBlock(block));
+    });
   }
 
   function renderPublicPage(pages) {
     var target = document.getElementById('managed-page');
     if (!target) return;
     var slug = new URLSearchParams(window.location.search).get('slug') || '';
-    if (!VALID_SLUG.test(slug)) return showMissing(target);
-    var page = pages.find(function (item) { return item.visible && item.slug === slug; });
-    if (!page) return showMissing(target);
-
-    document.title = page.title + ' | P-JSL';
-    var name = document.getElementById('page-title');
+    var page = pages.find(function (p) { return p.visible && p.slug === slug; });
+    var title = document.getElementById('page-title');
     var summary = document.getElementById('page-summary');
-    if (name) name.textContent = page.title;
-    if (summary) summary.textContent = page.summary;
     var body = document.getElementById('page-content');
-    if (body) renderContent(body, page.content);
-
     var link = document.getElementById('page-link');
-    if (link && page.linkLabel && validLink(page.linkUrl)) {
-      link.href = page.linkUrl;
-      link.textContent = page.linkLabel;
-      if (page.linkUrl.startsWith('https://')) {
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
+    if (!page) {
+      title.textContent = '페이지를 찾을 수 없습니다';
+      summary.textContent = '삭제되었거나 공개되지 않은 메뉴입니다.';
+      document.title = '페이지를 찾을 수 없습니다 | P-JSL';
+      return;
+    }
+    title.textContent = page.title;
+    summary.textContent = page.summary;
+    document.title = page.title + ' | P-JSL';
+    if (Array.isArray(page.blocks) && page.blocks.length) renderBlocks(body, page.blocks);
+    else renderContent(body, page.content || '');
+    if (link) {
+      link.hidden = true;
+      if (page.linkLabel && validLink(page.linkUrl)) {
+        link.hidden = false; link.textContent = page.linkLabel; link.href = page.linkUrl;
+        if (page.linkUrl.startsWith('https://')) {
+          link.target = '_blank'; link.rel = 'noopener noreferrer';
+        } else { link.removeAttribute('target'); link.removeAttribute('rel'); }
       }
-      link.hidden = false;
     }
   }
 
-  function showMissing(target) {
-    var title = document.getElementById('page-title');
-    var summary = document.getElementById('page-summary');
-    if (title) title.textContent = '페이지를 찾을 수 없습니다';
-    if (summary) summary.textContent = '삭제되었거나 공개되지 않은 메뉴입니다.';
-    document.title = '페이지를 찾을 수 없습니다 | P-JSL';
+  function loadPages() {
+    return fetch(DATA_URL, {cache: 'no-store', credentials: 'omit'}).then(function (response) {
+      if (!response.ok) throw new Error('메뉴 데이터를 불러올 수 없습니다.');
+      return response.json();
+    }).then(sanitizeRegistry);
   }
 
-  var nav = document.getElementById('custom-menu');
-  var pageHolder = document.getElementById('managed-page');
-  if (nav || pageHolder) {
-    loadPages().then(function (pages) {
-      if (nav) {
-        var slug = new URLSearchParams(window.location.search).get('slug');
-        buildNav(nav, pages, pageHolder ? slug : null);
-      }
-      if (pageHolder) renderPublicPage(pages);
-    }).catch(function () {
-      if (pageHolder) showMissing(pageHolder);
+  function buildNav(nav, pages, currentSlug) {
+    nav.replaceChildren();
+    pages.forEach(function (page) {
+      if (!page.visible) return;
+      var a = el('a', '', page.title);
+      a.href = '/pages/?slug=' + encodeURIComponent(page.slug);
+      if (currentSlug === page.slug) a.setAttribute('aria-current', 'page');
+      nav.appendChild(a);
     });
   }
 
-  // Safe text renderer is also shared with the administrator's preview pane.
+  var nav = document.getElementById('custom-menu');
+  var holder = document.getElementById('managed-page');
+  if (nav || holder) {
+    loadPages().then(function (pages) {
+      if (nav) buildNav(nav, pages,
+        holder ? new URLSearchParams(window.location.search).get('slug') : null);
+      if (holder) renderPublicPage(pages);
+    }).catch(function () {
+      if (holder) {
+        document.getElementById('page-title').textContent = '메뉴 정보를 불러오지 못했습니다';
+        document.getElementById('page-summary').textContent = '잠시 후 새로고침해 주세요.';
+      }
+    });
+  }
+
   window.SitePages = {
-    renderContent: renderContent,
+    validLink: validLink,
     validPage: validPage,
+    validBlock: validBlock,
     sanitizeRegistry: sanitizeRegistry,
-    validLink: validLink
+    renderContent: renderContent,
+    renderBlocks: renderBlocks,
+    renderBlock: renderBlock
   };
 }());
