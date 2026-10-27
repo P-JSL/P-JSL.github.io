@@ -1,4 +1,92 @@
 {
   "schema": 1,
-  "pages": []
+  "pages": [],
+  "home": {
+    "slug": "home",
+    "title": "Video App Download",
+    "summary": "Chrome 확장 프로그램과 Windows 데스크톱 다운로드",
+    "content": "",
+    "linkLabel": "",
+    "linkUrl": "",
+    "visible": true,
+    "blocks": [
+      {
+        "id": "home-hero",
+        "type": "hero",
+        "title": "미디어를 더 간편하게, 내 브라우저에서.",
+        "text": "My Video App의 Chrome 확장 프로그램과 Windows 데스크톱 프로그램을 각각 다운로드할 수 있습니다.",
+        "align": "left"
+      },
+      {
+        "id": "home-downloads",
+        "type": "downloads",
+        "title": "다운로드 선택",
+        "text": "브라우저 확장 프로그램과 Windows 데스크톱 버전을 별도로 제공합니다.",
+        "align": "left"
+      },
+      {
+        "id": "home-features-heading",
+        "type": "heading",
+        "title": "기능 소개",
+        "align": "left"
+      },
+      {
+        "id": "home-features",
+        "type": "cards",
+        "title": "브라우저에서 바로 시작",
+        "items": [
+          {
+            "title": "브라우저 로컬 실행",
+            "text": "계정 없이 이용하는 개인용 Chrome 확장 프로그램"
+          },
+          {
+            "title": "미디어 관리",
+            "text": "웹페이지의 미디어를 감지하고 다운로드합니다. 사이트별 지원 여부는 다를 수 있습니다."
+          },
+          {
+            "title": "무결성 확인",
+            "text": "버전, 파일 크기 및 ZIP 무결성 정보를 확인할 수 있습니다."
+          }
+        ],
+        "align": "left"
+      },
+      {
+        "id": "home-install-heading",
+        "type": "heading",
+        "title": "확장 프로그램 설치 방법",
+        "align": "left"
+      },
+      {
+        "id": "home-install",
+        "type": "list",
+        "title": "Chrome 120 이상",
+        "items": [
+          {
+            "title": "1. ZIP 다운로드",
+            "text": "최신 확장 프로그램 ZIP을 다운로드하고 압축을 해제합니다."
+          },
+          {
+            "title": "2. 확장 관리 열기",
+            "text": "주소창에서 chrome://extensions 페이지를 엽니다."
+          },
+          {
+            "title": "3. 개발자 모드",
+            "text": "개발자 모드를 켜고 압축해제된 확장 프로그램 로드를 선택합니다."
+          },
+          {
+            "title": "4. 폴더 선택",
+            "text": "manifest.json이 있는 my-video-app 폴더를 선택합니다."
+          }
+        ],
+        "align": "left"
+      },
+      {
+        "id": "home-notice",
+        "type": "notice",
+        "title": "추가 안내",
+        "text": "일부 기능은 별도의 도우미 설치가 필요할 수 있습니다. Windows Desktop은 공개 GitHub Release ZIP으로 제공됩니다.",
+        "align": "left"
+      }
+    ]
+  }
 }
