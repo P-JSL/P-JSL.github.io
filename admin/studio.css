@@ -9,3 +9,30 @@
 @media(max-width:750px){.preview .site-layout-grid>.site-block{grid-column:span 12}}
 .fixed-page{cursor:pointer;width:100%;text-align:left;border:1px solid #466981;color:var(--text)}
 .fixed-page.selected{outline:2px solid var(--cyan)}
+
+/* Commercial-style editor controls */
+.publish-status{font-size:12px;color:var(--mint);border:1px solid var(--line);padding:6px 12px;border-radius:999px}
+.editor-toolbar{display:flex;gap:12px;align-items:center;border:1px solid #426078;background:#172a3d;padding:10px 13px;border-radius:12px 12px 0 0;margin-top:10px}
+.editor-toolbar-label{font-weight:800;color:var(--cyan)}.toolbar-spacer{flex:1}
+.editor-toolbar+.canvas{border-top:0;border-radius:0 0 12px 12px}
+.device-toolbar{display:flex;align-items:center;gap:2px;background:#0b1929;border:1px solid var(--line);border-radius:10px;padding:4px}
+.device-toolbar button{font-size:12px;border:0;border-radius:7px;background:transparent;color:var(--muted);padding:7px 11px}
+.device-toolbar button.active{background:#27435d;color:var(--text)}
+.preview{max-width:100%;margin-left:auto;margin-right:auto;transition:max-width .18s ease}
+.preview[data-device="tablet"]{max-width:768px}
+.preview[data-device="mobile"]{max-width:390px}
+.preview[data-device="mobile"] .site-layout-grid>.site-block,.preview[data-device="tablet"] .site-layout-grid>.block-width-4{grid-column:span 12}
+.preview .site-layout-grid{gap:12px}
+.templates button{min-height:67px;display:flex;flex-direction:column;gap:5px}
+.templates button span{font-size:22px;color:var(--mint)}
+.theme-layout{display:grid;grid-template-columns:minmax(350px,1.1fr) minmax(270px,.9fr);gap:18px;align-items:start}
+.theme-presets{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0}
+.theme-presets button{border:1px solid #5a7892;color:var(--text);background:#1b3145;padding:9px 15px;border-radius:9px}
+.theme-inputs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.theme-inputs label{display:flex;flex-direction:column;gap:7px;font-weight:700}
+.theme-inputs input,.theme-inputs select{background:#0d192b;color:var(--text);border:1px solid #52657e;border-radius:8px;padding:10px;min-height:44px}
+.theme-sample{--sample-accent:#87daf8;--sample-secondary:#8deace;border:1px solid #536d82;border-radius:19px;padding:34px;background:radial-gradient(circle at top right,#2a4760,#15263a);min-height:360px}
+.theme-sample span{color:var(--sample-secondary);font-size:11px;letter-spacing:.1em;font-weight:800}
+.theme-sample h2{font-size:clamp(28px,3vw,39px);line-height:1.2;margin:30px 0 15px}
+.theme-sample button{border:0;border-radius:9px;padding:12px 22px;color:#061826;font-weight:800;background:linear-gradient(110deg,var(--sample-accent),var(--sample-secondary))}
+@media(max-width:900px){.theme-layout{grid-template-columns:1fr}.theme-inputs{grid-template-columns:1fr}}
