@@ -3,7 +3,7 @@
 
   var DATA_URL = '/site-pages.json';
   var VALID_SLUG = /^[a-z][a-z0-9-]{1,49}$/;
-  var BLOCK_TYPES = ['hero', 'heading', 'text', 'image', 'button', 'cards', 'list', 'notice', 'divider', 'spacer'];
+  var BLOCK_TYPES = ['hero', 'heading', 'text', 'image', 'button', 'cards', 'list', 'notice', 'divider', 'spacer', 'downloads'];
   var MAX_PAGES = 100;
   var MAX_BLOCKS = 60;
 
@@ -119,6 +119,19 @@
     if (block.align === 'center') box.classList.add('centered');
     var title = block.title || '';
     var text = block.text || '';
+    if (block.type === 'downloads') {
+      if (title) box.appendChild(el('h2', '', title));
+      if (text) box.appendChild(el('p', '', text));
+      var grid = el('div', 'site-card-grid');
+      var extension = el('article', 'site-content-card');
+      extension.appendChild(el('h3', '', 'Chrome Extension'));
+      appendLink(extension, '/downloads/latest-extension.zip', '확장 프로그램 ZIP 다운로드', 'site-block-button');
+      var desktop = el('article', 'site-content-card');
+      desktop.appendChild(el('h3', '', 'Windows Desktop x64'));
+      appendLink(desktop, 'https://github.com/P-JSL/P-JSL.github.io/releases/latest', '최신 Windows Release', 'site-block-button');
+      grid.appendChild(extension); grid.appendChild(desktop); box.appendChild(grid);
+      return box;
+    }
     if (block.type === 'divider') {
       box.appendChild(el('hr')); return box;
     }
@@ -225,10 +238,24 @@
     });
   }
 
+  function renderHome(home) {
+    if (!validPage(home) || home.slug !== 'home') return;
+    var host = document.getElementById('managed-home');
+    if (!host) return;
+    document.title = home.title + ' | P-JSL';
+    var link = document.getElementById('home-menu-link');
+    if (link) link.textContent = home.title;
+    var heading = document.getElementById('managed-home-title');
+    if (heading) heading.textContent = home.title;
+    renderBlocks(host, home.blocks || []);
+  }
+
   var nav = document.getElementById('custom-menu');
   var holder = document.getElementById('managed-page');
-  if (nav || holder) {
-    loadPages().then(function (pages) {
+  if (nav || holder || document.getElementById('managed-home')) {
+    fetch(DATA_URL, {cache:'no-store'}).then(function(response){if(!response.ok)throw Error('site data unavailable');return response.json();}).then(function(data){
+      var pages=sanitizeRegistry(data);
+      if (data.home) renderHome(data.home);
       if (nav) buildNav(nav, pages,
         holder ? new URLSearchParams(window.location.search).get('slug') : null);
       if (holder) renderPublicPage(pages);
