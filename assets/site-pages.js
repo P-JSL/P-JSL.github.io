@@ -166,7 +166,23 @@
       appendLink(extension, '/downloads/latest-extension.zip', '확장 프로그램 ZIP 다운로드', 'site-block-button');
       var desktop = el('article', 'site-content-card');
       desktop.appendChild(el('h3', '', 'Windows Desktop x64'));
-      appendLink(desktop, 'https://github.com/P-JSL/P-JSL.github.io/releases/latest', '최신 Windows Release', 'site-block-button');
+      var desktopLink = el('a', 'site-block-button', 'Windows x64 ZIP 다운로드');
+      desktopLink.href = 'https://github.com/P-JSL/P-JSL.github.io/releases/download/desktop_v1.18/my-video-app-desktop-windows-x64.zip';
+      desktopLink.rel = 'noopener noreferrer';
+      desktop.appendChild(desktopLink);
+      if (!document.getElementById('inspector-fields')) {
+        fetch('https://api.github.com/repos/P-JSL/P-JSL.github.io/releases?per_page=30')
+          .then(function(r){if(!r.ok)throw Error('release lookup');return r.json();})
+          .then(function(releases){
+            for(var i=0;i<releases.length;i++){
+              if(releases[i].draft||releases[i].prerelease)continue;
+              var asset=(releases[i].assets||[]).find(function(a){return /desktop[-_ ]windows|windows[-_ ]x64/i.test(a.name)&&a.state==='uploaded';});
+              if(asset&&asset.browser_download_url&&asset.browser_download_url.indexOf('https://github.com/P-JSL/P-JSL.github.io/releases/download/')===0){
+                desktopLink.href=asset.browser_download_url;return;
+              }
+            }
+          }).catch(function(){});
+      }
       grid.appendChild(extension); grid.appendChild(desktop); box.appendChild(grid);
       return box;
     }
