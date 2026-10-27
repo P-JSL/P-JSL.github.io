@@ -11,3 +11,9 @@ code{font-family:Consolas,ui-monospace,monospace;color:var(--accent);overflow-wr
 #upload-panel[hidden],#auth-panel[hidden],#progress-wrap[hidden]{display:none}
 table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border-bottom:1px solid var(--stroke);text-align:left;padding:12px 6px;font-size:13px}th{color:var(--muted);font-weight:650}
 @media(max-width:640px){.panel{padding:18px}.top{margin-bottom:25px}.actions button{flex:1}}
+
+#cms-panel[hidden],#cms-preview[hidden]{display:none}
+.cms-grid{display:grid;grid-template-columns:minmax(180px,.75fr) minmax(0,1.6fr);gap:22px;margin-top:16px}
+.cms-grid label{margin-top:13px}.cms-grid select,.cms-grid textarea{display:block;width:100%;border:1px solid #52657e;background:#0d192b;color:var(--fg);border-radius:9px;padding:11px;font:inherit}
+.cms-grid select{min-height:230px}.cms-grid textarea{resize:vertical}.cms-grid .cms-check{display:flex;align-items:center;gap:8px}.cms-check input{width:auto}.cms-preview{border:1px solid var(--stroke);padding:20px;border-radius:12px;margin-top:20px;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:720px){.cms-grid{grid-template-columns:1fr}}
