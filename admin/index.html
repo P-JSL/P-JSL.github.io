@@ -7,10 +7,12 @@ layout: null
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src https://api.github.com; img-src 'self' data:; form-action 'none'; base-uri 'none'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' data:; form-action 'none'; base-uri 'none'; object-src 'none'; upgrade-insecure-requests">
 <title>관리자 업로드 | My Video App</title>
 <link rel="stylesheet" href="./style.css?v=20261026-1827">
-<script src="./app.js?v=20261026-1827" defer></script>
+<script src="/assets/site-pages.js" defer></script>
+<script src="./app.js?v=20261027-1546" defer></script>
+<script src="./cms.js?v=20261027-1546" defer></script>
 </head>
 <body><div class="wrap">
 <header class="top"><a href="/">My Video App</a><span class="small">ADMIN · GITHUB</span></header>
@@ -35,6 +37,29 @@ layout: null
 <div id="progress-wrap" hidden><progress id="progress" max="100" value="0"></progress><p id="progress-text" class="small"></p></div>
 <p class="status" id="upload-status" role="status" aria-live="polite"></p>
 <p class="small"><a href="https://github.com/P-JSL/P-JSL.github.io/actions" target="_blank" rel="noopener noreferrer">GitHub Actions 배포 확인</a> · <a href="/downloads/latest-extension.zip" target="_blank" rel="noopener noreferrer">확장 ZIP</a> · <a href="/">일반 다운로드 페이지</a></p>
+</section>
+<section class="panel" id="cms-panel" hidden aria-labelledby="cms-title">
+<h2 id="cms-title">3. 홈페이지 메뉴 · 화면 관리</h2>
+<p class="small">기본 메뉴 <strong>Video App Download</strong>는 고정됩니다. 추가 메뉴는 GitHub 저장소 <code>site-pages.json</code>에 직접 커밋되며 Pages 배포 후 홈페이지에 나타납니다.</p>
+<div class="cms-grid">
+<div>
+<label for="cms-pages">추가된 메뉴</label>
+<select id="cms-pages" size="7" aria-label="관리 중인 메뉴"></select>
+<div class="actions"><button type="button" id="cms-new" class="ghost">새 메뉴</button><button type="button" id="cms-up" class="ghost">위로</button><button type="button" id="cms-down" class="ghost">아래로</button><button type="button" id="cms-delete" class="ghost">삭제</button></div>
+</div>
+<div>
+<label for="cms-title-input">메뉴 이름</label><input id="cms-title-input" maxlength="60" placeholder="새 메뉴">
+<label for="cms-slug">주소 식별자 (영문 소문자·숫자·하이픈)</label><input id="cms-slug" maxlength="50" placeholder="my-project">
+<label for="cms-summary">화면 설명</label><textarea id="cms-summary" rows="2" maxlength="240"></textarea>
+<label for="cms-content">본문 (제목: # 또는 ##, 목록: -)</label><textarea id="cms-content" rows="10" maxlength="30000" placeholder="# 화면 제목&#10;&#10;페이지 내용을 작성하세요."></textarea>
+<label for="cms-link-label">외부/내부 링크 버튼명 (선택)</label><input id="cms-link-label" maxlength="60">
+<label for="cms-link-url">링크 주소 (HTTPS 또는 / 내부경로)</label><input id="cms-link-url" maxlength="1000" placeholder="https://example.com">
+<label class="cms-check"><input type="checkbox" id="cms-visible" checked> 메뉴 공개</label>
+<div class="actions"><button type="button" id="cms-preview-button" class="ghost">미리보기</button><button type="button" id="cms-save">GitHub에 저장 및 배포</button></div>
+<p id="cms-status" class="status" role="status" aria-live="polite"></p>
+</div>
+</div>
+<div class="cms-preview" id="cms-preview" hidden><h3>화면 미리보기</h3><div id="cms-preview-content"></div></div>
 </section>
 <section class="panel" aria-labelledby="limit-title">
 <h2 id="limit-title">250MB ZIP 업로드</h2>
