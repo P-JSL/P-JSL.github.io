@@ -90,8 +90,8 @@
   },
   "pages": [],
   "theme": {
-    "accent": "#87daf8",
-    "secondary": "#8deace",
+    "accent": "#d4dce7",
+    "secondary": "#8c9aae",
     "maxWidth": 1080,
     "radius": "large"
   }
