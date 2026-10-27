@@ -3,7 +3,7 @@
 
   var DATA_URL = '/site-pages.json';
   var VALID_SLUG = /^[a-z][a-z0-9-]{1,49}$/;
-  var BLOCK_TYPES = ['hero', 'heading', 'text', 'image', 'button', 'cards', 'list', 'notice', 'divider', 'spacer', 'downloads'];
+  var BLOCK_TYPES = ['hero', 'heading', 'text', 'image', 'button', 'cards', 'list', 'notice', 'divider', 'spacer', 'downloads', 'download'];
   var MAX_PAGES = 100;
   var MAX_BLOCKS = 60;
 
@@ -32,6 +32,14 @@
           return !item || typeof item !== 'object' || typeof item.title !== 'string' ||
             item.title.length > 100 || typeof item.text !== 'string' || item.text.length > 750;
         }))) return false;
+    if (block.width !== undefined && ![4,6,8,12].includes(block.width)) return false;
+    if (block.variant !== undefined && !['plain','panel','accent'].includes(block.variant)) return false;
+    if (block.type === 'download' && (
+      !['folder','release'].includes(block.source) ||
+      typeof block.filename !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,199}$/.test(block.filename) ||
+      (block.source === 'release' && (typeof block.releaseTag !== 'string' ||
+       !/^(latest|[a-zA-Z0-9][a-zA-Z0-9._-]{0,119})$/.test(block.releaseTag)))
+    )) return false;
     if (block.type === 'image' && (!block.url || !validLink(block.url))) return false;
     if (block.type === 'button' && (!block.url || !validLink(block.url))) return false;
     return true;
@@ -117,8 +125,38 @@
   function renderBlock(block) {
     var box = el('section', 'site-block site-block-' + block.type);
     if (block.align === 'center') box.classList.add('centered');
+    box.classList.add('block-width-'+(block.width||12));
+    box.classList.add('block-variant-'+(block.variant||'plain'));
     var title = block.title || '';
     var text = block.text || '';
+    if (block.type === 'download') {
+      if (title) box.appendChild(el('h2', '', title));
+      if (text) box.appendChild(el('p', '', text));
+      var action = el('a', 'site-block-button', block.label || 'ZIP 다운로드');
+      var rel = 'https://github.com/P-JSL/P-JSL.github.io/releases/download/';
+      if (block.source === 'folder') {
+        action.href = '/downloads/' + encodeURIComponent(block.filename);
+      } else if (block.releaseTag === 'latest') {
+        action.href = 'https://github.com/P-JSL/P-JSL.github.io/releases/latest';
+        // GitHub API resolves the newest published release containing the selected asset.
+        if (!document.getElementById('inspector-fields')) {
+          fetch('https://api.github.com/repos/P-JSL/P-JSL.github.io/releases?per_page=30')
+            .then(function(r){if(!r.ok)throw Error('release lookup');return r.json();})
+            .then(function(releases){
+              for(var i=0;i<releases.length;i++){
+                var r=releases[i];if(r.draft||r.prerelease)continue;
+                var a=(r.assets||[]).find(function(x){return x.name===block.filename&&x.state==='uploaded';});
+                if(a&&a.browser_download_url&&a.browser_download_url.indexOf(rel)===0){action.href=a.browser_download_url;return;}
+              }
+              action.textContent='Release에서 파일 보기';
+            }).catch(function(){action.textContent='최신 Release 보기';});
+        }
+      } else {
+        action.href = rel + encodeURIComponent(block.releaseTag) + '/' + encodeURIComponent(block.filename);
+      }
+      if (block.source==='release'){action.rel='noopener noreferrer';}
+      box.appendChild(action);return box;
+    }
     if (block.type === 'downloads') {
       if (title) box.appendChild(el('h2', '', title));
       if (text) box.appendChild(el('p', '', text));
@@ -184,6 +222,7 @@
 
   function renderBlocks(host, blocks) {
     host.replaceChildren();
+    host.classList.add('site-layout-grid');
     blocks.forEach(function (block) {
       if (validBlock(block)) host.appendChild(renderBlock(block));
     });
