@@ -1,6 +1,5 @@
 {
   "schema": 1,
-  "pages": [],
   "home": {
     "slug": "home",
     "title": "Video App Download",
@@ -88,5 +87,12 @@
         "align": "left"
       }
     ]
+  },
+  "pages": [],
+  "theme": {
+    "accent": "#87daf8",
+    "secondary": "#8deace",
+    "maxWidth": 1080,
+    "radius": "large"
   }
 }
