@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 var ROOT='/repos/P-JSL/P-JSL.github.io',PAGES=ROOT+'/contents/site-pages.json',LIMIT=25*1024*1024;
-var token=null,pages=[],sha=null,current=-1,activeBlock=-1,dirty=false,working=false;
+var token=null,pages=[],home=null,sha=null,current=-1,activeBlock=-1,dirty=false,working=false;
 var $=function(id){return document.getElementById(id);};
 function msg(t,bad){$('global-message').textContent=t;$('global-message').className='global-message '+(bad?'error':'ok');}
 async function api(method,path,body){
@@ -28,23 +28,25 @@ $('auth-view').hidden=true;$('workspace').hidden=false;$('signout').hidden=false
 async function load(){
 var d=await api('GET',PAGES);if(d.missing)throw Error('site-pages.json을 찾을 수 없습니다.');
 var doc=JSON.parse(dec(d.content));if(doc.schema!==1||!Array.isArray(doc.pages)||doc.pages.some(function(p){return !SitePages.validPage(p);}))throw Error('페이지 데이터 오류');
+home=doc.home||null;if(!home)throw Error('기본 홈페이지 설정이 없습니다.');
 pages=doc.pages.map(function(p){if(!Array.isArray(p.blocks)){p.blocks=p.content?[block('text','',p.content)]:[];}return p;});sha=d.sha;current=-1;activeBlock=-1;dirty=false;drawPages();renderEditor();msg('GitHub 메뉴 '+pages.length+'개 동기화 완료');
 }
 function change(){dirty=true;msg('저장되지 않은 변경 사항이 있습니다.');}
-function page(){return pages[current];}
+function page(){return current===-2?home:pages[current];}
 function drawPages(){
+var base=$('home-page-button');if(base){base.textContent=home?home.title:'Video App Download';base.classList.toggle('selected',current===-2);}
 var list=$('page-list');list.replaceChildren();
 pages.forEach(function(p,i){var b=label('button',p.title);b.className='page-entry'+(i===current?' selected':'');b.type='button';
 var sub=label('small',p.slug+(p.visible?'':' · 비공개'));b.appendChild(sub);b.onclick=function(){select(i);};list.appendChild(b);});
 }
-function select(i){if(current>=0)readFields();current=i;activeBlock=-1;drawPages();renderEditor();}
-function readFields(){if(!page())return;page().title=$('page-title-input').value.trim();page().slug=$('page-slug').value.trim();page().summary=$('page-summary-input').value.trim();page().visible=$('page-visible').checked;}
+function select(i){if(page())readFields();current=i;activeBlock=-1;drawPages();renderEditor();}
+function readFields(){if(!page())return;page().title=$('page-title-input').value.trim();if(current!==-2){page().slug=$('page-slug').value.trim();page().visible=$('page-visible').checked;}page().summary=$('page-summary-input').value.trim();}
 function renderEditor(){
 var p=page();$('editor').hidden=!p;$('empty-state').hidden=!!p;if(!p){renderPreview();return;}
-$('page-title-input').value=p.title;$('page-slug').value=p.slug;$('page-summary-input').value=p.summary;$('page-visible').checked=p.visible;
+$('page-title-input').value=p.title;$('page-slug').value=p.slug;$('page-summary-input').value=p.summary;$('page-visible').checked=p.visible;$('page-slug').disabled=current===-2;$('page-visible').disabled=current===-2;$('delete-page').disabled=current===-2;$('move-page-up').disabled=current===-2;$('move-page-down').disabled=current===-2;
 renderCanvas();drawInspector();renderPreview();
 }
-var TYPES=[['hero','히어로'],['heading','제목'],['text','텍스트'],['image','이미지'],['button','버튼'],['cards','카드'],['list','목록'],['notice','안내'],['divider','구분선'],['spacer','여백']];
+var TYPES=[['downloads','자동 다운로드'],['hero','히어로'],['heading','제목'],['text','텍스트'],['image','이미지'],['button','버튼'],['cards','카드'],['list','목록'],['notice','안내'],['divider','구분선'],['spacer','여백']];
 var templates={
 blank:[],
 landing:[['hero','새로운 페이지','원하는 내용을 소개하세요.'],['cards','핵심 기능',''],['button','','']],
@@ -81,30 +83,31 @@ function drawInspector(){
 var host=$('inspector-fields');host.replaceChildren();var b=page()&&page().blocks[activeBlock];$('inspector-empty').hidden=!!b;$('inspector-actions').hidden=!b;if(!b)return;
 function field(title,key,multi){inputField(host,title,b[key],function(v){b[key]=v;},multi);}
 if(!['divider','spacer','button','image'].includes(b.type))field('제목','title');
-if(['hero','text','notice'].includes(b.type))field('설명·본문','text',true);
+if(['hero','text','notice','downloads'].includes(b.type))field('설명·본문','text',true);
 if(['image','button'].includes(b.type))field('링크 URL (https 또는 / 내부경로)','url');
 if(b.type==='image'){field('대체 텍스트','alt');field('캡션','caption');}
 if(b.type==='button')field('버튼 이름','label');
 if(['cards','list'].includes(b.type)){
 var l=label('label','항목 (한 줄당 제목 | 설명, 최대 12개)');var ta=document.createElement('textarea');ta.value=(b.items||[]).map(function(x){return x.title+' | '+x.text;}).join('\n');ta.oninput=function(){b.items=ta.value.split('\n').filter(Boolean).slice(0,12).map(function(line){var n=line.indexOf('|');return {title:(n<0?line:line.slice(0,n)).trim().slice(0,100),text:(n<0?'':line.slice(n+1)).trim().slice(0,750)};});change();renderPreview();renderCanvas();};host.appendChild(l);host.appendChild(ta);
 }
-if(!['divider','spacer'].includes(b.type)){var l=label('label','정렬');var sel=document.createElement('select');['left','center'].forEach(function(v){var o=label('option',v==='left'?'왼쪽':'가운데');o.value=v;sel.appendChild(o);});sel.value=b.align||'left';sel.onchange=function(){b.align=sel.value;change();renderPreview();renderCanvas();};host.appendChild(l);host.appendChild(sel);}
+if(!['divider','spacer','downloads'].includes(b.type)){var l=label('label','정렬');var sel=document.createElement('select');['left','center'].forEach(function(v){var o=label('option',v==='left'?'왼쪽':'가운데');o.value=v;sel.appendChild(o);});sel.value=b.align||'left';sel.onchange=function(){b.align=sel.value;change();renderPreview();renderCanvas();};host.appendChild(l);host.appendChild(sel);}
 }
 function shiftBlock(d){if(!page()||activeBlock<0)return;var j=activeBlock+d;if(j<0||j>=page().blocks.length)return;var b=page().blocks.splice(activeBlock,1)[0];page().blocks.splice(j,0,b);activeBlock=j;change();renderCanvas();drawInspector();renderPreview();}
 function renderPreview(){var host=$('preview');host.replaceChildren();if(page()){var title=label('h1',page().title);host.appendChild(title);host.appendChild(label('p',page().summary));var body=document.createElement('div');SitePages.renderBlocks(body,page().blocks||[]);host.appendChild(body);}else host.appendChild(label('p','페이지를 선택하면 실시간 미리보기가 나타납니다.'));}
-function createPage(template){if(pages.length>=100)return msg('메뉴는 최대 100개입니다.',true);if(current>=0)readFields();var count=pages.length+1,slug='page-'+count;while(pages.some(function(p){return p.slug===slug;})){count++;slug='page-'+count;}var p={slug:slug,title:'새 메뉴 '+count,summary:'',content:'',linkLabel:'',linkUrl:'',visible:true,blocks:(templates[template]||[]).map(function(x){return block(x[0],x[1],x[2]);})};pages.push(p);current=pages.length-1;activeBlock=-1;change();drawPages();renderEditor();}
+function createPage(template){if(pages.length>=100)return msg('메뉴는 최대 100개입니다.',true);if(page())readFields();var count=pages.length+1,slug='page-'+count;while(pages.some(function(p){return p.slug===slug;})){count++;slug='page-'+count;}var p={slug:slug,title:'새 메뉴 '+count,summary:'',content:'',linkLabel:'',linkUrl:'',visible:true,blocks:(templates[template]||[]).map(function(x){return block(x[0],x[1],x[2]);})};pages.push(p);current=pages.length-1;activeBlock=-1;change();drawPages();renderEditor();}
 async function save(){
-if(working)return;if(current>=0)readFields();
+if(working)return;if(page())readFields();
+if(!home||!SitePages.validPage(home)||home.slug!=='home'||!home.visible||!home.blocks.some(function(b){return b.type==='downloads';}))return msg('기본 홈페이지에는 다운로드 블록이 1개 이상 필요합니다.',true);
 if(pages.some(function(p){return !SitePages.validPage(p);}))return msg('메뉴명, 주소 식별자, 블록 URL·내용을 확인하세요. 링크는 HTTPS 또는 /로 시작해야 합니다.',true);
 var seen=new Set();for(var p of pages){if(seen.has(p.slug))return msg('메뉴 주소가 중복되었습니다.',true);seen.add(p.slug);}
 if(!dirty)return msg('저장할 변경 사항이 없습니다.');
 if(!confirm('메뉴 '+pages.length+'개의 변경 사항을 GitHub에 저장하고 배포하시겠습니까?'))return;
 working=true;$('save').disabled=true;
-try{var output=await api('PUT',PAGES,{message:'Update site pages via visual drag-and-drop studio',branch:'main',sha:sha,content:enc(JSON.stringify({schema:1,pages:pages},null,2)+'\n')});sha=output.content.sha;dirty=false;msg('GitHub 저장 성공: '+output.commit.sha+' · Pages 자동 배포가 시작됩니다.');}
+try{var output=await api('PUT',PAGES,{message:'Update site pages via visual drag-and-drop studio',branch:'main',sha:sha,content:enc(JSON.stringify({schema:1,home:home,pages:pages},null,2)+'\n')});sha=output.content.sha;dirty=false;msg('GitHub 저장 성공: '+output.commit.sha+' · Pages 자동 배포가 시작됩니다.');}
 catch(e){msg('저장 실패: '+e.message+' · 다른 사용자의 변경이 있었다면 GitHub 새로고침 후 다시 편집하세요.',true);}
 finally{working=false;$('save').disabled=false;}
 }
-function logout(){token=null;pages=[];sha=null;current=-1;dirty=false;$('workspace').hidden=true;$('auth-view').hidden=false;$('signout').hidden=true;$('token').value='';$('auth-chip').textContent='잠금 상태';}
+function logout(){token=null;pages=[];home=null;sha=null;current=-1;dirty=false;$('workspace').hidden=true;$('auth-view').hidden=false;$('signout').hidden=true;$('token').value='';$('auth-chip').textContent='잠금 상태';}
 function selectTab(name){document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.toggle('active',b.dataset.tab===name);});['designer','files','info'].forEach(function(n){$(n+'-tab').hidden=n!==name;});}
 async function uploadZip(){
 var f=$('zip-file').files[0];if(!f||f.size>LIMIT||f.size===0)return;
@@ -120,13 +123,13 @@ var out=await api('PUT',path,request);$('upload-message').textContent='업로드
 }catch(e){$('upload-message').textContent='실패: '+e.message;}finally{$('zip-upload').disabled=false;}
 }
 $('login').onclick=login;$('signout').onclick=logout;$('refresh').onclick=async function(){if(dirty&&!confirm('저장하지 않은 변경을 버리고 GitHub에서 새로고침하시겠습니까?'))return;try{await load();}catch(e){msg(e.message,true);}};
-$('save').onclick=save;$('add-page').onclick=function(){createPage('blank');};
+$('save').onclick=save;$('add-page').onclick=function(){createPage('blank');};$('home-page-button').onclick=function(){select(-2);};
 $('page-title-input').oninput=$('page-slug').oninput=$('page-summary-input').oninput=$('page-visible').onchange=function(){if(!page())return;readFields();change();drawPages();renderPreview();};
 $('delete-page').onclick=function(){if(current<0)return;if(!confirm('선택한 메뉴를 삭제하시겠습니까? 저장을 눌러 확정됩니다.'))return;pages.splice(current,1);current=-1;change();drawPages();renderEditor();};
 function movePage(delta){if(current<0)return;var j=current+delta;if(j<0||j>=pages.length)return;readFields();var p=pages.splice(current,1)[0];pages.splice(j,0,p);current=j;change();drawPages();}
 $('move-page-up').onclick=function(){movePage(-1);};$('move-page-down').onclick=function(){movePage(1);};
 $('block-up').onclick=function(){shiftBlock(-1);};$('block-down').onclick=function(){shiftBlock(1);};
-$('block-delete').onclick=function(){if(!page()||activeBlock<0)return;page().blocks.splice(activeBlock,1);activeBlock=-1;change();renderCanvas();drawInspector();renderPreview();};
+$('block-delete').onclick=function(){if(!page()||activeBlock<0)return;if(current===-2&&page().blocks[activeBlock].type==='downloads'&&page().blocks.filter(function(b){return b.type==='downloads';}).length===1)return msg('최신 버전 다운로드를 유지하기 위해 마지막 다운로드 블록은 삭제할 수 없습니다.',true);page().blocks.splice(activeBlock,1);activeBlock=-1;change();renderCanvas();drawInspector();renderPreview();};
 TYPES.forEach(function(t){var b=label('button',t[1]);b.draggable=true;b.onclick=function(){add(t[0]);};b.ondragstart=function(e){e.dataTransfer.setData('text/plain','add:'+t[0]);};$('palette').appendChild(b);});
 $('templates').querySelectorAll('[data-template]').forEach(function(b){b.onclick=function(){if(current>=0){if(!confirm('새 메뉴를 이 템플릿으로 생성하시겠습니까?'))return;}createPage(b.dataset.template);};});
 document.querySelectorAll('[data-tab]').forEach(function(b){b.onclick=function(){selectTab(b.dataset.tab);};});
