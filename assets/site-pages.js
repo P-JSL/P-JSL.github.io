@@ -293,6 +293,15 @@
     });
   }
 
+  function applySiteTheme(theme) {
+    if (!theme || typeof theme !== 'object') return;
+    var hex=/^#[0-9a-fA-F]{6}$/;
+    if (typeof theme.accent==='string' && hex.test(theme.accent)) document.documentElement.style.setProperty('--blue',theme.accent);
+    if (typeof theme.secondary==='string' && hex.test(theme.secondary)) document.documentElement.style.setProperty('--mint',theme.secondary);
+    if ([960,1080,1200,1360].includes(theme.maxWidth)) document.documentElement.style.setProperty('--site-max-width',theme.maxWidth+'px');
+    if (['small','medium','large'].includes(theme.radius)) document.documentElement.dataset.radius=theme.radius;
+  }
+
   function renderHome(home) {
     if (!validPage(home) || home.slug !== 'home') return;
     var host = document.getElementById('managed-home');
@@ -310,6 +319,7 @@
   if (nav || holder || document.getElementById('managed-home')) {
     fetch(DATA_URL, {cache:'no-store'}).then(function(response){if(!response.ok)throw Error('site data unavailable');return response.json();}).then(function(data){
       var pages=sanitizeRegistry(data);
+      applySiteTheme(data.theme);
       if (data.home) renderHome(data.home);
       if (nav) buildNav(nav, pages,
         holder ? new URLSearchParams(window.location.search).get('slug') : null);
