@@ -103,6 +103,8 @@
       if (!repo || !repo.permissions || repo.permissions.push !== true) {
         throw new Error('P-JSL.github.io 저장소 Contents 쓰기 권한이 없습니다.');
       }
+      window.AdminSiteApi = { request: github };
+      document.dispatchEvent(new Event('admin-authenticated'));
       authPanel.hidden = true;
       uploadPanel.hidden = false;
       document.getElementById('identity').textContent = 'GitHub 관리자 인증: ' + user.login;
@@ -110,6 +112,7 @@
       updateUploadAvailability();
     } catch (error) {
       token = null;
+      window.AdminSiteApi = null;
       setStatus(authStatus, error.message, false);
     } finally { setBusy(false); }
   }
@@ -200,6 +203,8 @@
 
   function logout() {
     token = null;
+    window.AdminSiteApi = null;
+    document.dispatchEvent(new Event('admin-logout'));
     tokenInput.value = '';
     fileInput.value = '';
     progressWrap.hidden = true;
