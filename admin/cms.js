@@ -73,7 +73,7 @@ try{
 async function save(){
 if(working)return;
 try{
- applyForm();
+ if(selected>=0 || $('cms-title-input').value.trim() || $('cms-slug').value.trim())applyForm();
  var input=JSON.stringify({schema:1,pages:pages},null,2)+'\n';
  if(!confirm('메뉴 '+pages.length+'개의 설정을 GitHub main 브랜치에 저장하고 Pages 배포를 시작하시겠습니까?'))return;
  workingState(true);status('GitHub에 변경 사항을 커밋하는 중입니다.');
