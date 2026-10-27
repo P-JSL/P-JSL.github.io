@@ -13,7 +13,7 @@ if(!r.ok)throw Error('GitHub HTTP '+r.status+': '+(d.message||'요청 오류'));
 return d;
 }
 function dec(s){var b=atob(s.replace(/\s/g,'')),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new TextDecoder().decode(a);}
-function enc(s){var a=new TextEncoder().encode(s),x=[];for(var i=0;i<a.length;i+=8192){var p='';for(var j=i;j<Math.min(a.length,i+8192);j++)p+=String.fromCharCode(a[j]);x.push(btoa(p));}return x.join('');}
+function enc(s){var a=new TextEncoder().encode(s),x=[];for(var i=0;i<a.length;i+=8190){var p='';for(var j=i;j<Math.min(a.length,i+8190);j++)p+=String.fromCharCode(a[j]);x.push(btoa(p));}return x.join('');}
 function label(t,text){var l=document.createElement(t);l.textContent=text;return l;}
 async function login(){
 var t=$('token').value.trim();if(!t)return $('auth-message').textContent='토큰을 입력하세요.';
@@ -28,7 +28,7 @@ $('auth-view').hidden=true;$('workspace').hidden=false;$('signout').hidden=false
 async function load(){
 var d=await api('GET',PAGES);if(d.missing)throw Error('site-pages.json을 찾을 수 없습니다.');
 var doc=JSON.parse(dec(d.content));if(doc.schema!==1||!Array.isArray(doc.pages)||doc.pages.some(function(p){return !SitePages.validPage(p);}))throw Error('페이지 데이터 오류');
-pages=doc.pages;sha=d.sha;current=-1;activeBlock=-1;dirty=false;drawPages();renderEditor();msg('GitHub 메뉴 '+pages.length+'개 동기화 완료');
+pages=doc.pages.map(function(p){if(!Array.isArray(p.blocks)){p.blocks=p.content?[block('text','',p.content)]:[];}return p;});sha=d.sha;current=-1;activeBlock=-1;dirty=false;drawPages();renderEditor();msg('GitHub 메뉴 '+pages.length+'개 동기화 완료');
 }
 function change(){dirty=true;msg('저장되지 않은 변경 사항이 있습니다.');}
 function page(){return pages[current];}
