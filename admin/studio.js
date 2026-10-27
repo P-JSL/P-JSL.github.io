@@ -89,6 +89,30 @@ var sourceLabel=label('label','다운로드 저장 위치');var sourceSelect=doc
 [['folder','내부 downloads 폴더'],['release','GitHub 공개 Release']].forEach(function(x){var o=label('option',x[1]);o.value=x[0];sourceSelect.appendChild(o);});
 sourceSelect.value=b.source||'folder';sourceSelect.onchange=function(){b.source=sourceSelect.value;change();drawInspector();renderPreview();renderCanvas();};host.appendChild(sourceLabel);host.appendChild(sourceSelect);
 field('파일명 (.zip 포함)','filename');field('다운로드 버튼 텍스트','label');
+var pickLabel=label('label','GitHub에 게시된 파일에서 선택');
+var picker=document.createElement('select'),placeholder=label('option','파일 목록 불러오는 중...');placeholder.value='';picker.appendChild(placeholder);
+host.appendChild(pickLabel);host.appendChild(picker);
+var selectedBlock=b;
+if(b.source==='folder'){
+api('GET',ROOT+'/contents/downloads').then(function(list){
+if(!Array.isArray(list))throw Error('파일 목록을 가져오지 못했습니다.');
+picker.replaceChildren();var first=label('option','파일 선택');first.value='';picker.appendChild(first);
+list.filter(function(f){return f.type==='file'&&/\.zip$/i.test(f.name);}).forEach(function(file){var o=label('option',file.name);o.value=file.name;picker.appendChild(o);});
+}).catch(function(){picker.replaceChildren(label('option','파일 목록 조회 실패'));});
+}else{
+api('GET',ROOT+'/releases?per_page=30').then(function(releases){
+if(!Array.isArray(releases))throw Error('릴리스 목록을 가져오지 못했습니다.');
+picker.replaceChildren();var first=label('option','릴리스 첨부파일 선택');first.value='';picker.appendChild(first);
+releases.filter(function(r){return !r.draft&&!r.prerelease;}).forEach(function(r){
+(r.assets||[]).filter(function(a){return a.state==='uploaded';}).forEach(function(asset){var o=label('option',r.tag_name+' / '+asset.name);o.value=JSON.stringify({tag:r.tag_name,file:asset.name});picker.appendChild(o);});
+});
+}).catch(function(){picker.replaceChildren(label('option','Release 목록 조회 실패'));});
+}
+picker.onchange=function(){if(!picker.value)return;if(b.source==='folder'){selectedBlock.filename=picker.value;}else{
+var choice=JSON.parse(picker.value);selectedBlock.releaseTag=choice.tag;selectedBlock.filename=choice.file;
+}
+change();drawInspector();renderPreview();renderCanvas();};
+
 if(b.source==='release')field('Release 태그 (latest 또는 desktop_v1.18)','releaseTag');
 }
 if(['image','button'].includes(b.type))field('링크 URL (https 또는 / 내부경로)','url');
