@@ -20,3 +20,9 @@ footer{border-top:1px solid var(--stroke);padding:24px 0;margin-top:70px;color:v
 .site-layout-grid>.block-variant-panel{padding:20px;background:#1a2b41;border:1px solid var(--stroke);border-radius:14px}
 .site-layout-grid>.block-variant-accent{padding:20px;background:linear-gradient(120deg,#1c3b50,#19483e);border-radius:14px}
 @media(max-width:780px){.site-layout-grid>.block-width-4,.site-layout-grid>.block-width-6,.site-layout-grid>.block-width-8{grid-column:span 12}}
+
+:root{--site-max-width:1080px}
+.wrap{max-width:var(--site-max-width)}
+:root[data-radius="small"] .site-block,:root[data-radius="small"] .site-content-card{border-radius:4px}
+:root[data-radius="large"] .site-block,:root[data-radius="large"] .site-content-card{border-radius:24px}
+.site-block-button{background:linear-gradient(110deg,var(--blue),var(--mint))}
