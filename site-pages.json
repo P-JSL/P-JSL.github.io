@@ -24,6 +24,23 @@
         "align": "left"
       },
       {
+        "id": "bmvqolwnrrm46g5",
+        "type": "download",
+        "title": "폴더 정리 프로그램",
+        "text": "폴더 정리 프로그램 v0.2.0",
+        "url": "",
+        "label": "FolderOrganizer 다운로드",
+        "alt": "",
+        "caption": "",
+        "align": "left",
+        "width": 12,
+        "variant": "panel",
+        "source": "release",
+        "filename": "FolderOrganizer-Windows-x64.zip",
+        "releaseTag": "desktop_v1.18",
+        "items": []
+      },
+      {
         "id": "home-features-heading",
         "type": "heading",
         "title": "기능 소개",
