@@ -24,9 +24,10 @@ footer{border-top:1px solid var(--line);padding-top:30px;padding-bottom:40px;col
 @media(max-width:760px){.hero{grid-template-columns:1fr;padding:60px 0 35px;gap:30px}.preview{max-width:500px}.grid,.steps{grid-template-columns:1fr}.info dl{grid-template-columns:1fr;gap:3px}.info dd{margin-bottom:11px}.menu{gap:11px}.menu a{font-size:12px}h1{letter-spacing:-1.5px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
+<script src="/assets/site-pages.js" defer></script>
 </head>
 <body>
-<header><a class="brand" href="/"><span class="symbol">M</span>My Video App</a><nav class="menu" aria-label="탐색"><a href="#downloads">다운로드</a><a href="#intro">소개</a><a href="#install">설치 방법</a><a href="#verify">파일 검증</a><a href="/admin/" title="관리자 파일 업로드">관리자</a></nav></header>
+<header><a class="brand" href="/"><span class="symbol">M</span>My Video App</a><nav class="menu" aria-label="탐색"><a href="#downloads">다운로드</a><a href="#intro">소개</a><a href="#install">설치 방법</a><a href="#verify">파일 검증</a><span class="menu" id="custom-menu"></span><a href="/admin/" title="관리자 파일 업로드">관리자</a></nav></header>
 <main>
 <div class="hero"><div>
 <span class="tag" id="release-badge">CHROME EXTENSION · v1.16.0</span>
