@@ -102,7 +102,8 @@ picker.replaceChildren();var first=label('option','파일 선택');first.value='
 list.filter(function(f){return f.type==='file'&&/\.zip$/i.test(f.name);}).forEach(function(file){var o=label('option',file.name);o.value=file.name;picker.appendChild(o);});
 }).catch(function(){picker.replaceChildren(label('option','파일 목록 조회 실패'));});
 }else{
-api('GET',ROOT+'/releases?per_page=30').then(function(releases){
+var targetRepo=b.releaseRepo||'P-JSL/P-JSL.github.io';
+api('GET','/repos/'+targetRepo+'/releases?per_page=30').then(function(releases){
 if(!Array.isArray(releases))throw Error('릴리스 목록을 가져오지 못했습니다.');
 picker.replaceChildren();var first=label('option','릴리스 첨부파일 선택');first.value='';picker.appendChild(first);
 releases.filter(function(r){return !r.draft&&!r.prerelease;}).forEach(function(r){
@@ -115,7 +116,7 @@ var choice=JSON.parse(picker.value);selectedBlock.releaseTag=choice.tag;selected
 }
 change();drawInspector();renderPreview();renderCanvas();};
 
-if(b.source==='release')field('Release 태그 (latest 또는 desktop_v1.18)','releaseTag');
+if(b.source==='release'){field('Release 저장소 (owner/repo)','releaseRepo');field('Release 태그 (latest 또는 특정 버전)','releaseTag');}
 }
 if(['image','button'].includes(b.type))field('링크 URL (https 또는 / 내부경로)','url');
 if(b.type==='image'){field('대체 텍스트','alt');field('캡션','caption');}
