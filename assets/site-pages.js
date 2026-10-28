@@ -34,6 +34,8 @@
         }))) return false;
     if (block.width !== undefined && ![4,6,8,12].includes(block.width)) return false;
     if (block.variant !== undefined && !['plain','panel','accent'].includes(block.variant)) return false;
+    if (block.releaseRepo !== undefined && (typeof block.releaseRepo !== 'string' ||
+      !/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(block.releaseRepo) || block.releaseRepo.length > 160)) return false;
     if (block.type === 'download' && (
       !['folder','release'].includes(block.source) ||
       typeof block.filename !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,199}$/.test(block.filename) ||
@@ -133,28 +135,19 @@
       if (title) box.appendChild(el('h2', '', title));
       if (text) box.appendChild(el('p', '', text));
       var action = el('a', 'site-block-button', block.label || 'ZIP 다운로드');
-      var rel = 'https://github.com/P-JSL/P-JSL.github.io/releases/download/';
+      var repository = block.releaseRepo || 'P-JSL/P-JSL.github.io';
+      var releaseBase = 'https://github.com/' + repository + '/releases/download/';
       if (block.source === 'folder') {
         action.href = '/downloads/' + encodeURIComponent(block.filename);
       } else if (block.releaseTag === 'latest') {
-        action.href = 'https://github.com/P-JSL/P-JSL.github.io/releases/latest';
-        // GitHub API resolves the newest published release containing the selected asset.
-        if (!document.getElementById('inspector-fields')) {
-          fetch('https://api.github.com/repos/P-JSL/P-JSL.github.io/releases?per_page=30')
-            .then(function(r){if(!r.ok)throw Error('release lookup');return r.json();})
-            .then(function(releases){
-              for(var i=0;i<releases.length;i++){
-                var r=releases[i];if(r.draft||r.prerelease)continue;
-                var a=(r.assets||[]).find(function(x){return x.name===block.filename&&x.state==='uploaded';});
-                if(a&&a.browser_download_url&&a.browser_download_url.indexOf(rel)===0){action.href=a.browser_download_url;return;}
-              }
-              action.textContent='Release에서 파일 보기';
-            }).catch(function(){action.textContent='최신 Release 보기';});
-        }
+        // GitHub's release asset URL is stable across version changes if filenames are stable.
+        action.href = 'https://github.com/' + repository + '/releases/latest/download/' + encodeURIComponent(block.filename);
       } else {
-        action.href = rel + encodeURIComponent(block.releaseTag) + '/' + encodeURIComponent(block.filename);
+        action.href = releaseBase + encodeURIComponent(block.releaseTag) + '/' + encodeURIComponent(block.filename);
       }
-      if (block.source==='release'){action.rel='noopener noreferrer';}
+      if (block.source === 'release') {
+        action.rel = 'noopener noreferrer';
+      }
       box.appendChild(action);return box;
     }
     if (block.type === 'downloads') {
