@@ -27,9 +27,9 @@
         "id": "bmvqolwnrrm46g5",
         "type": "download",
         "title": "폴더 정리 프로그램",
-        "text": "폴더 정리 프로그램 v0.2.0",
+        "text": "Folder Organizer · 최신 정식 버전 자동 다운로드",
         "url": "",
-        "label": "FolderOrganizer 다운로드",
+        "label": "FolderOrganizer 최신 ZIP 다운로드",
         "alt": "",
         "caption": "",
         "align": "left",
@@ -37,8 +37,9 @@
         "variant": "panel",
         "source": "release",
         "filename": "FolderOrganizer-Windows-x64.zip",
-        "releaseTag": "desktop_v1.18",
-        "items": []
+        "releaseTag": "latest",
+        "items": [],
+        "releaseRepo": "P-JSL/Folder_Organizer"
       },
       {
         "id": "home-features-heading",
