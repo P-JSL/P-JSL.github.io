@@ -34,6 +34,8 @@
         }))) return false;
     if (block.width !== undefined && ![4,6,8,12].includes(block.width)) return false;
     if (block.variant !== undefined && !['plain','panel','accent'].includes(block.variant)) return false;
+    if (block.assetPrefix !== undefined && (typeof block.assetPrefix !== 'string' ||
+      block.assetPrefix.length > 160 || (block.assetPrefix && !/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(block.assetPrefix)))) return false;
     if (block.releaseRepo !== undefined && (typeof block.releaseRepo !== 'string' ||
       !/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(block.releaseRepo) || block.releaseRepo.length > 160)) return false;
     if (block.type === 'download' && (
@@ -134,21 +136,72 @@
     if (block.type === 'download') {
       if (title) box.appendChild(el('h2', '', title));
       if (text) box.appendChild(el('p', '', text));
-      var action = el('a', 'site-block-button', block.label || 'ZIP 다운로드');
+      var label = block.label || 'ZIP 다운로드';
       var repository = block.releaseRepo || 'P-JSL/P-JSL.github.io';
       var releaseBase = 'https://github.com/' + repository + '/releases/download/';
+      if (block.source === 'release' && block.releaseTag === 'latest' && block.assetPrefix) {
+        // Version-suffixed assets cannot use releases/latest/download/<fixed filename>.
+        // Resolve the actual ZIP from the latest published non-prerelease Release only.
+        var status = el('p', 'site-download-status', '최신 정식 Release 확인 중...');
+        box.appendChild(status);
+        var action = el('a', 'site-block-button site-download-disabled', '다운로드 확인 중');
+        action.setAttribute('aria-disabled', 'true');
+        box.appendChild(action);
+        if (!document.getElementById('inspector-fields')) {
+          var apiUrl = 'https://api.github.com/repos/' + repository + '/releases/latest';
+          fetch(apiUrl, {cache:'no-store', credentials:'omit', headers:{'Accept':'application/vnd.github+json'}})
+            .then(function(response) {
+              if (response.status === 404) {
+                status.textContent = '정식 Release 미게시 · 다운로드 준비 중';
+                action.textContent = '다운로드 준비 중';
+                return null;
+              }
+              if (!response.ok) throw Error('최신 Release 정보를 조회할 수 없습니다.');
+              return response.json();
+            })
+            .then(function(release) {
+              if (!release) return;
+              if (release.draft || release.prerelease) throw Error('정식 Release 확인 실패');
+              var prefix = block.assetPrefix.toLowerCase();
+              var asset = (release.assets || []).find(function(a) {
+                return a.state === 'uploaded' &&
+                  a.name.toLowerCase().startsWith(prefix) && a.name.toLowerCase().endsWith('.zip') &&
+                  a.browser_download_url && a.browser_download_url.startsWith(releaseBase);
+              });
+              if (!asset) {
+                status.textContent = '최신 ' + (release.tag_name || '') + ' Release에 해당 ZIP 없음';
+                action.textContent = '다운로드 준비 중';
+                return;
+              }
+              action.href = asset.browser_download_url;
+              action.rel = 'noopener noreferrer';
+              action.removeAttribute('aria-disabled');
+              action.classList.remove('site-download-disabled');
+              action.textContent = label;
+              status.textContent = (release.tag_name || '최신 Release') +
+                ' · ' + (asset.size / 1048576).toFixed(1) + ' MiB';
+            })
+            .catch(function() {
+              status.textContent = '최신 Release 조회 실패 · 나중에 다시 확인하세요';
+              action.textContent = '다운로드 확인 실패';
+            });
+        } else {
+          status.textContent = '배포 후 최신 정식 Release의 ZIP을 자동 검색합니다.';
+          action.textContent = label + ' (미리보기)';
+        }
+        return box;
+      }
+      var action = el('a', 'site-block-button', label);
       if (block.source === 'folder') {
         action.href = '/downloads/' + encodeURIComponent(block.filename);
       } else if (block.releaseTag === 'latest') {
-        // GitHub's release asset URL is stable across version changes if filenames are stable.
         action.href = 'https://github.com/' + repository + '/releases/latest/download/' + encodeURIComponent(block.filename);
       } else {
         action.href = releaseBase + encodeURIComponent(block.releaseTag) + '/' + encodeURIComponent(block.filename);
       }
-      if (block.source === 'release') {
-        action.rel = 'noopener noreferrer';
-      }
-      box.appendChild(action);return box;
+      if (block.source === 'release') action.rel = 'noopener noreferrer';
+      box.appendChild(action);
+      return box;
     }
     if (block.type === 'downloads') {
       if (title) box.appendChild(el('h2', '', title));
