@@ -54,7 +54,7 @@ landing:[['hero','새로운 페이지','원하는 내용을 소개하세요.'],[
 news:[['heading','공지사항',''],['notice','최신 소식','변경 사항을 안내하세요.'],['text','상세 내용','내용을 입력하세요.']],
 products:[['hero','프로젝트 소개','프로젝트를 확인하세요.'],['cards','프로젝트',''],['button','','']]
 };
-function block(type,title,text){return {id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),type:type,title:title||'',text:text||'',url:'',label:'',alt:'',caption:'',align:'left',width:12,variant:'plain',source:'folder',filename:'',releaseTag:'latest',items:type==='cards'?[{title:'항목 1',text:'설명'},{title:'항목 2',text:'설명'}]:[]};}
+function block(type,title,text){return {id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),type:type,title:title||'',text:text||'',url:'',label:'',alt:'',caption:'',align:'left',width:12,variant:'plain',source:'folder',filename:'',releaseTag:'latest',assetPrefix:'',items:type==='cards'?[{title:'항목 1',text:'설명'},{title:'항목 2',text:'설명'}]:[]};}
 function add(type,index){if(!page())return msg('먼저 페이지를 선택하세요.',true);recordHistory();if(page().blocks.length>=60)return msg('블록은 최대 60개입니다.',true);var b=block(type);page().blocks.splice(index===undefined?page().blocks.length:index,0,b);activeBlock=page().blocks.indexOf(b);change();renderCanvas();drawInspector();renderPreview();}
 function renderCanvas(){
 var host=$('canvas');host.replaceChildren();$('editor-duplicate').disabled=activeBlock<0;if(!page())return;
@@ -116,7 +116,11 @@ var choice=JSON.parse(picker.value);selectedBlock.releaseTag=choice.tag;selected
 }
 change();drawInspector();renderPreview();renderCanvas();};
 
-if(b.source==='release'){field('Release 저장소 (owner/repo)','releaseRepo');field('Release 태그 (latest 또는 특정 버전)','releaseTag');}
+if(b.source==='release'){
+  field('Release 저장소 (owner/repo)','releaseRepo');
+  field('Release 태그 (latest 또는 특정 버전)','releaseTag');
+  if(b.releaseTag==='latest')field('최신 ZIP 파일명 접두사 (버전별 파일명 자동 선택)','assetPrefix');
+}
 }
 if(['image','button'].includes(b.type))field('링크 URL (https 또는 / 내부경로)','url');
 if(b.type==='image'){field('대체 텍스트','alt');field('캡션','caption');}
