@@ -26,3 +26,7 @@ footer{border-top:1px solid var(--stroke);padding:24px 0;margin-top:70px;color:v
 :root[data-radius="small"] .site-block,:root[data-radius="small"] .site-content-card{border-radius:4px}
 :root[data-radius="large"] .site-block,:root[data-radius="large"] .site-content-card{border-radius:24px}
 .site-block-button{background:linear-gradient(110deg,var(--blue),var(--mint))}
+
+/* Latest-release download blocks: never offer a dead/stale asset link. */
+.site-download-status{font-size:13px;color:var(--muted);margin:8px 0 12px;white-space:pre-wrap}
+.site-download-disabled{display:inline-block;color:var(--muted);background:#2d3949;border:1px solid #556578;cursor:not-allowed;pointer-events:none}
