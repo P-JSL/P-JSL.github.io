@@ -1,6 +1,67 @@
 {
   "schema": 1,
-  "updated_at": null,
-  "metric": "Download button click attempts successfully recorded by the counter API; not completed file transfers.",
-  "counts": {}
+  "updated_at": "2026-11-05T02:18:35.979Z",
+  "metric": "Published GitHub Release ZIP asset download_count (all stable versions)",
+  "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
+  "counts": {
+    "video-desktop": 7,
+    "home:folderorganizer-rust": 12,
+    "home:bmvqolwnrrm46g5": 38,
+    "home:tools-jeus-go": 3,
+    "home:tools-jeus-rust": 11,
+    "home:tools-novel-rust": 2,
+    "video-extension-local": null
+  },
+  "items": [
+    {
+      "id": "video-desktop",
+      "label": "Video App · Windows",
+      "source": "release",
+      "status": "available",
+      "count": 7
+    },
+    {
+      "id": "home:folderorganizer-rust",
+      "label": "Folder Organizer · Rust",
+      "source": "release",
+      "status": "available",
+      "count": 12
+    },
+    {
+      "id": "home:bmvqolwnrrm46g5",
+      "label": "Folder Organizer · Python",
+      "source": "release",
+      "status": "available",
+      "count": 38
+    },
+    {
+      "id": "home:tools-jeus-go",
+      "label": "JEUS Lens · Go",
+      "source": "release",
+      "status": "available",
+      "count": 3
+    },
+    {
+      "id": "home:tools-jeus-rust",
+      "label": "JEUS Lens · Rust",
+      "source": "release",
+      "status": "available",
+      "count": 11
+    },
+    {
+      "id": "home:tools-novel-rust",
+      "label": "Syousetu Translate · Rust",
+      "source": "release",
+      "status": "available",
+      "count": 2
+    },
+    {
+      "id": "video-extension-local",
+      "label": "Video App · Chrome Extension",
+      "source": "pages",
+      "status": "not_measured",
+      "count": null
+    }
+  ],
+  "note": "GitHub Pages /downloads ZIP transfers have no count API: null means not measured, not zero."
 }
