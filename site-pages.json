@@ -141,6 +141,33 @@
         "items": []
       },
       {
+        "id": "gacha-pickup-heading",
+        "type": "heading",
+        "title": "가챠 픽업 확률 계산기",
+        "align": "left",
+        "width": 12,
+        "variant": "plain"
+      },
+      {
+        "id": "gacha-pickup-calculator-windows",
+        "type": "download",
+        "title": "Gacha Pickup Calculator · Windows",
+        "text": "붕괴: 스타레일 · 명조 · 이환 · 스텔라 소라. Rust 기반 마르코프 연쇄·동적 계획법 확률 계산 GUI (Windows x64)",
+        "label": "최신 Windows EXE 다운로드",
+        "source": "release",
+        "releaseRepo": "P-JSL/gacha_pickup_calculator",
+        "releaseTag": "latest",
+        "filename": "gacha_pickup_calculator.exe",
+        "assetPrefix": "",
+        "url": "",
+        "alt": "",
+        "caption": "",
+        "align": "left",
+        "width": 12,
+        "variant": "panel",
+        "items": []
+      },
+      {
         "id": "home-features-heading",
         "type": "heading",
         "title": "기능 소개",
