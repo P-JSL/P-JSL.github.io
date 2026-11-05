@@ -17,6 +17,37 @@
     } catch (_) { return false; }
   }
 
+  // Convert only approved HTTPS and same-origin paths to canonical URLs.
+  // Never assign an unvalidated editor/JSON value directly to href or src.
+  function safeContentUrl(raw) {
+    if (!validLink(raw)) return null;
+    try {
+      var base = window.location.origin;
+      var parsed = new URL(raw, base);
+      if (parsed.protocol !== 'https:') return null;
+      if (raw.charAt(0) === '/' && parsed.origin !== base) return null;
+      return parsed.href;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // URL path segments are encoded individually; user-controlled strings cannot
+  // become another origin, scheme, query string, or path segment.
+  function releaseAssetUrl(repository, tag, filename) {
+    var match = /^([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)$/.exec(repository);
+    if (!match || typeof filename !== 'string' ||
+        !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,199}$/.test(filename) ||
+        !/^(latest|[a-zA-Z0-9][a-zA-Z0-9._-]{0,119})$/.test(tag)) return null;
+    var origin = 'https://github.com';
+    var urlPath = '/' + encodeURIComponent(match[1]) + '/' +
+      encodeURIComponent(match[2]) + '/releases/' +
+      (tag === 'latest' ? 'latest/download/' : 'download/' + encodeURIComponent(tag) + '/') +
+      encodeURIComponent(filename);
+    var url = new URL(urlPath, origin);
+    return url.origin === origin && url.protocol === 'https:' ? url.href : null;
+  }
+
   function validBlock(block) {
     if (!block || typeof block !== 'object' || !BLOCK_TYPES.includes(block.type) ||
         typeof block.id !== 'string' || !/^[a-zA-Z0-9_-]{1,70}$/.test(block.id)) return false;
@@ -89,10 +120,11 @@
   }
 
   function appendLink(host, url, label, className) {
-    if (!label || !validLink(url)) return;
+    var safeUrl = safeContentUrl(url);
+    if (!label || !safeUrl) return;
     var a = el('a', className, label);
-    a.href = url;
-    if (url.indexOf('https://') === 0) {
+    a.href = safeUrl;
+    if (url.charAt(0) !== '/') {
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
     }
@@ -204,14 +236,17 @@
         return box;
       }
       var action = el('a', 'site-block-button', label);
-      if (block.source === 'folder') {
-        action.href = '/downloads/' + encodeURIComponent(block.filename);
-      } else if (block.releaseTag === 'latest') {
-        action.href = 'https://github.com/' + repository + '/releases/latest/download/' + encodeURIComponent(block.filename);
+      var targetUrl = block.source === 'folder'
+        ? safeContentUrl('/downloads/' + encodeURIComponent(block.filename))
+        : releaseAssetUrl(repository, block.releaseTag, block.filename);
+      if (!targetUrl) {
+        action.textContent = '다운로드 링크 오류';
+        action.classList.add('site-download-disabled');
+        action.setAttribute('aria-disabled', 'true');
       } else {
-        action.href = releaseBase + encodeURIComponent(block.releaseTag) + '/' + encodeURIComponent(block.filename);
+        action.href = targetUrl;
+        if (block.source === 'release') action.rel = 'noopener noreferrer';
       }
-      if (block.source === 'release') action.rel = 'noopener noreferrer';
       box.appendChild(action);
       return box;
     }
@@ -251,7 +286,9 @@
     if (block.type === 'image') {
       var img = el('img', 'site-content-image');
       img.loading = 'lazy'; img.decoding = 'async'; img.alt = block.alt || title || '페이지 이미지';
-      img.referrerPolicy = 'no-referrer'; img.src = block.url;
+      var safeImageUrl = safeContentUrl(block.url);
+      if (!safeImageUrl) return box;
+      img.referrerPolicy = 'no-referrer'; img.src = safeImageUrl;
       box.appendChild(img);
       if (block.caption) box.appendChild(el('p', 'image-caption', block.caption));
       return box;
