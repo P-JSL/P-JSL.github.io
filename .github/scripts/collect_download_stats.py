@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = ROOT / "site-pages.json"
 OUTPUT_PATH = ROOT / "assets" / "download-stats.json"
+COUNTS_PATH = ROOT / "downloads" / "download-counts.json"
 KST = dt.timezone(dt.timedelta(hours=9))
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 REPO_PATTERN = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
@@ -125,7 +126,6 @@ def update_snapshot():
     if OUTPUT_PATH.exists():
         old = json.loads(OUTPUT_PATH.read_text(encoding="utf-8"))
     definitions = series_definitions(config)
-    previous = {item["id"]: item for item in old.get("series", [])}
     grouped = {}
     failures = {}
     for definition in definitions:
@@ -153,6 +153,12 @@ def update_snapshot():
             item["total"] = count_assets(grouped.get(repository, []), item)
             item["status"] = "available" if item["total"] is not None else "unpublished"
         series.append(item)
+
+    if failures and not grouped:
+        # If no repository was successfully queried, preserve the last known
+        # published snapshot instead of replacing it with unknown values.
+        print("WARNING: all statistics sources unavailable; preserving previous data", file=sys.stderr)
+        return
 
     old_history = old.get("history", [])
     history = [row for row in old_history if isinstance(row, dict) and "date" in row]
@@ -190,6 +196,31 @@ def update_snapshot():
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(
         json.dumps(output, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    # This is a periodically refreshed snapshot of GitHub Release metrics.
+    # Never change this file from a visitor's download-click event.
+    counts_snapshot = {
+        "schema": 1,
+        "updated_at": output["captured_at"],
+        "metric": "Published GitHub Release ZIP asset download_count (all stable versions)",
+        "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
+        "counts": {item["id"]: item["total"] for item in series},
+        "items": [
+            {
+                "id": item["id"],
+                "label": item["label"],
+                "source": item["source"],
+                "status": item["status"],
+                "count": item["total"],
+            }
+            for item in series
+        ],
+        "note": "GitHub Pages /downloads ZIP transfers have no count API: null means not measured, not zero.",
+    }
+    COUNTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    COUNTS_PATH.write_text(
+        json.dumps(counts_snapshot, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
     for item in series:
