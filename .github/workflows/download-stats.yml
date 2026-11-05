@@ -2,8 +2,9 @@ name: Collect Download Statistics
 
 on:
   schedule:
-    # Daily at 11:15 Korea time (02:15 UTC).
-    - cron: '15 2 * * *'
+    # Every six hours: 02:17, 08:17, 14:17, 20:17 UTC.
+    # Scheduling is best effort; jobs can start later than the cron timestamp.
+    - cron: '17 2,8,14,20 * * *'
   workflow_dispatch:
 
 permissions:
@@ -32,10 +33,11 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/download-stats.json
+          git add assets/download-stats.json downloads/download-counts.json
           if git diff --staged --quiet; then
             echo "Statistics unchanged"
             exit 0
           fi
-          git commit -m "Record daily release-download statistics"
+          git commit -m "Update periodic GitHub Release download statistics"
+          git pull --rebase origin main
           git push origin HEAD:main
