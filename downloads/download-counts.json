@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "updated_at": "2026-11-05T02:33:09Z",
-  "metric": "Published GitHub Release ZIP asset download_count (all stable versions)",
+  "updated_at": "2026-11-05T07:33:01Z",
+  "metric": "Published GitHub Release ZIP/EXE asset download_count (all stable versions)",
   "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
   "counts": {
     "video-desktop": 7,
@@ -10,6 +10,7 @@
     "home:tools-jeus-go": 3,
     "home:tools-jeus-rust": 11,
     "home:tools-novel-rust": 2,
+    "home:gacha-pickup-calculator-windows": 0,
     "video-extension-local": null
   },
   "items": [
@@ -54,6 +55,13 @@
       "source": "release",
       "status": "available",
       "count": 2
+    },
+    {
+      "id": "home:gacha-pickup-calculator-windows",
+      "label": "Gacha Pickup Calculator · Windows",
+      "source": "release",
+      "status": "available",
+      "count": 0
     },
     {
       "id": "video-extension-local",
