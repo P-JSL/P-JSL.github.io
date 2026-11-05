@@ -3,7 +3,7 @@
 
   var DATA_URL = '/site-pages.json';
   var VALID_SLUG = /^[a-z][a-z0-9-]{1,49}$/;
-  var BLOCK_TYPES = ['hero', 'heading', 'text', 'image', 'button', 'cards', 'list', 'notice', 'divider', 'spacer', 'downloads', 'download'];
+  var BLOCK_TYPES = ['hero', 'heading', 'text', 'image', 'button', 'cards', 'list', 'notice', 'divider', 'spacer', 'downloads', 'download', 'stats'];
   var MAX_PAGES = 100;
   var MAX_BLOCKS = 60;
 
@@ -133,6 +133,18 @@
     box.classList.add('block-variant-'+(block.variant||'plain'));
     var title = block.title || '';
     var text = block.text || '';
+    if (block.type === 'stats') {
+      if (title) box.appendChild(el('h2', '', title));
+      var target = el('div', 'site-stats');
+      if (text) target.appendChild(el('p','site-stats-intro',text));
+      box.appendChild(target);
+      if (window.DownloadTrends && !document.getElementById('inspector-fields')) {
+        window.DownloadTrends.mount(target);
+      } else {
+        target.appendChild(el('p','stats-empty','사이트 게시 후 GitHub Release 다운로드 통계가 표시됩니다.'));
+      }
+      return box;
+    }
     if (block.type === 'download') {
       if (title) box.appendChild(el('h2', '', title));
       if (text) box.appendChild(el('p', '', text));
