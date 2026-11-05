@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Collect GitHub Release asset download-count snapshots for P-JSL Pages.
 
-Numbers are GitHub Release asset download_count values aggregated across all
+Numbers are GitHub Release ZIP/EXE asset download_count values aggregated across all
 published non-prerelease versions. GitHub Pages /downloads files are not counted.
 Daily increases are *observed changes between snapshots*, not historical events.
 """
@@ -100,7 +100,7 @@ def github_release_pages(repository):
 
 
 def count_assets(releases, definition):
-    """Sum the exact release ZIP (or versioned ZIP prefix) across all versions."""
+    """Sum exact Release ZIP/EXE assets (or versioned filename prefixes)."""
     count = 0
     matched = 0
     prefix = definition["assetPrefix"].lower()
@@ -108,7 +108,7 @@ def count_assets(releases, definition):
     for release in releases:
         for asset in release.get("assets", []):
             name = str(asset.get("name") or "").lower()
-            if asset.get("state") != "uploaded" or not name.endswith(".zip"):
+            if asset.get("state") != "uploaded" or not name.endswith((".zip", ".exe")):
                 continue
             matches = name.startswith(prefix) if prefix else name == filename
             if matches:
@@ -203,7 +203,7 @@ def update_snapshot():
     counts_snapshot = {
         "schema": 1,
         "updated_at": output["captured_at"],
-        "metric": "Published GitHub Release ZIP asset download_count (all stable versions)",
+        "metric": "Published GitHub Release ZIP/EXE asset download_count (all stable versions)",
         "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
         "counts": {item["id"]: item["total"] for item in series},
         "items": [
