@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-11-05T02:31:20Z",
+  "updated_at": "2026-11-05T02:33:09Z",
   "metric": "Published GitHub Release ZIP asset download_count (all stable versions)",
   "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
   "counts": {
