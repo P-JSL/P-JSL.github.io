@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: download-statistics-snapshot
@@ -34,6 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python .github/scripts/collect_download_stats.py
       - name: Commit snapshot if changed
+        id: snapshot
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -41,8 +43,15 @@ jobs:
           git add assets/download-stats.json downloads/download-counts.json
           if git diff --staged --quiet; then
             echo "Statistics unchanged"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "Update periodic GitHub Release download statistics"
           git pull --rebase origin main
           git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Publish updated statistics to Pages
+        if: steps.snapshot.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --ref main
