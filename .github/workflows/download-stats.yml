@@ -1,10 +1,15 @@
 name: Collect Download Statistics
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/download-stats.yml'
+      - '.github/scripts/collect_download_stats.py'
   schedule:
-    # Every six hours: 02:17, 08:17, 14:17, 20:17 UTC.
-    # Scheduling is best effort; jobs can start later than the cron timestamp.
-    - cron: '17 2,8,14,20 * * *'
+    # Once per day at approximately 11:17 Asia/Seoul (02:17 UTC).
+    # GitHub scheduled workflows may start later than the scheduled time.
+    - cron: '17 2 * * *'
   workflow_dispatch:
 
 permissions:
