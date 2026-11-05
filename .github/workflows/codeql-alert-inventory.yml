@@ -1,3 +1,4 @@
+# Recheck open alerts following URL validation changes.
 name: CodeQL Alert Inventory (temporary)
 
 on:
