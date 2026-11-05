@@ -47,7 +47,7 @@ var p=page();$('editor').hidden=!p;$('empty-state').hidden=!!p;if(!p){renderPrev
 $('page-title-input').value=p.title;$('page-slug').value=p.slug;$('page-summary-input').value=p.summary;$('page-visible').checked=p.visible;$('page-slug').disabled=current===-2;$('page-visible').disabled=current===-2;$('delete-page').disabled=current===-2;$('move-page-up').disabled=current===-2;$('move-page-down').disabled=current===-2;
 renderCanvas();drawInspector();renderPreview();
 }
-var TYPES=[['downloads','기본 다운로드'],['download','파일 다운로드'],['hero','히어로'],['heading','제목'],['text','텍스트'],['image','이미지'],['button','버튼'],['cards','카드'],['list','목록'],['notice','안내'],['divider','구분선'],['spacer','여백']];
+var TYPES=[['downloads','기본 다운로드'],['download','파일 다운로드'],['stats','다운로드 통계'],['hero','히어로'],['heading','제목'],['text','텍스트'],['image','이미지'],['button','버튼'],['cards','카드'],['list','목록'],['notice','안내'],['divider','구분선'],['spacer','여백']];
 var templates={
 blank:[],
 landing:[['hero','새로운 페이지','원하는 내용을 소개하세요.'],['cards','핵심 기능',''],['button','','']],
@@ -85,7 +85,7 @@ function drawInspector(){
 var host=$('inspector-fields');host.replaceChildren();var b=page()&&page().blocks[activeBlock];$('inspector-empty').hidden=!!b;$('inspector-actions').hidden=!b;if(!b)return;
 function field(title,key,multi){inputField(host,title,b[key],function(v){b[key]=v;},multi);}
 if(!['divider','spacer','button','image'].includes(b.type))field('제목','title');
-if(['hero','text','notice','downloads','download'].includes(b.type))field('설명·본문','text',true);
+if(['hero','text','notice','downloads','download','stats'].includes(b.type))field('설명·본문','text',true);
 if(b.type==='download'){
 var sourceLabel=label('label','다운로드 저장 위치');var sourceSelect=document.createElement('select');
 [['folder','내부 downloads 폴더'],['release','GitHub 공개 Release']].forEach(function(x){var o=label('option',x[1]);o.value=x[0];sourceSelect.appendChild(o);});
