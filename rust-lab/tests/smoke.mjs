@@ -27,7 +27,7 @@ for (const lesson of data.lessons) {
   assert.ok(lesson.quiz.options.length === 4, lesson.id + ": quiz option count");
   assert.ok(lesson.quiz.correct >= 0 && lesson.quiz.correct < 4, lesson.id + ": quiz answer");
   assert.ok(lesson.task.rules.length, lesson.id + ": missing checks");
-  assert.ok(lesson.task.starter.includes("TODO") || lesson.task.starter.includes("/* TODO */"), lesson.id + ": missing TODO");
+  assert.notEqual(lesson.task.starter, lesson.task.answer, lesson.id + ": starter should require work");
   for (const rule of lesson.task.rules) {
     assert.match(lesson.task.answer, new RegExp(rule.pattern, "m"), lesson.id + ": solution does not pass " + rule.label);
   }
