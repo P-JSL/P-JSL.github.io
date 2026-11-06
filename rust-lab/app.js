@@ -96,7 +96,7 @@ if(action==="hint"&&l)notice("힌트: "+l.task.hint);
 if(action==="answer"&&l){let box=el("#solution-box");box.classList.toggle("visible");b.textContent=box.classList.contains("visible")?"정답 숨기기":"정답 보기"}
 if(action==="reset"&&l){el("#rust-editor").value=l.task.starter;st.drafts[l.id]=l.task.starter;st.checked[l.id]=false;el("#code-feedback").hidden=true;save();notice("실습 코드를 초기화했습니다.")}
 if(action==="answer-quiz")selectQuiz(Number(b.dataset.choice));
-if(action==="playground"&&l){const url="https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&code="+encodeURIComponent(el("#rust-editor").value);window.open(url,"_blank","noopener,noreferrer")}
+if(action==="playground"&&l){const input=el("#rust-editor").value;const code=/\bfn\s+main\s*\(/.test(input)||/#\s*\[\s*test\s*\]/.test(input)?input:input+"\n\nfn main() {}\n";const url="https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&code="+encodeURIComponent(code);window.open(url,"_blank","noopener,noreferrer")}
 if(action==="copy-example"&&l){const k=b.dataset.kind,c=k==="java"?l.java:k==="rust"?l.rust:l.task.answer;try{await navigator.clipboard.writeText(c);notice("코드를 복사했습니다.")}catch{notice("브라우저에서 복사를 허용하지 않았습니다.")}}
 if(action==="choose-file"){sourceFull=false;location.hash=sourceRoute(b.dataset.file)}
 if(action==="source-full"){sourceFull=!sourceFull;el("#main").innerHTML=sourcePage(route());fetchSource()}
