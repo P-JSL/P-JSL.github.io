@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "captured_at": "2026-11-05T07:33:01Z",
+  "captured_at": "2026-11-06T09:27:40Z",
   "timezone": "Asia/Seoul",
   "source": "GitHub Releases REST API: assets[].download_count",
   "series": [
@@ -31,7 +31,7 @@
       "filename": "FolderOrganizer-Windows-x64.zip",
       "assetPrefix": "",
       "source": "release",
-      "total": 38,
+      "total": 39,
       "status": "available"
     },
     {
@@ -71,7 +71,7 @@
       "filename": "gacha_pickup_calculator.exe",
       "assetPrefix": "",
       "source": "release",
-      "total": 0,
+      "total": 28,
       "status": "available"
     },
     {
@@ -97,6 +97,19 @@
         "home:tools-novel-rust": 2,
         "video-extension-local": null,
         "home:gacha-pickup-calculator-windows": 0
+      }
+    },
+    {
+      "date": "2026-11-06",
+      "counts": {
+        "video-desktop": 7,
+        "home:folderorganizer-rust": 12,
+        "home:bmvqolwnrrm46g5": 39,
+        "home:tools-jeus-go": 3,
+        "home:tools-jeus-rust": 11,
+        "home:tools-novel-rust": 2,
+        "home:gacha-pickup-calculator-windows": 28,
+        "video-extension-local": null
       }
     }
   ],
