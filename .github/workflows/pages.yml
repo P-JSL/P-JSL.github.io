@@ -6,6 +6,7 @@ on:
       - 'index.html'
       - 'admin/**'
       - 'pages/**'
+      - 'rust-lab/**'
       - 'assets/site-pages.js'
       - 'assets/site-pages.css'
       - 'assets/download-chart.js'
@@ -34,6 +35,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Verify Rust Learning Lab
+        run: node rust-lab/tests/smoke.mjs
       - uses: actions/configure-pages@v5
       - name: Publish latest ZIP downloads
         run: python3 .github/scripts/prepare_download.py
