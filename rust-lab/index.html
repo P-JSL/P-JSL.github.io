@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1222">
+<meta name="description" content="Java를 조금 아는 개발자를 위한 무료 Rust 입문. 실제 Gacha Pickup Calculator 소스로 배우는 31강, 퀴즈, 코드 실습, 소스 탐험.">
+<meta property="og:title" content="Rust Learning Lab | Java에서 실전 Rust까지">
+<meta property="og:description" content="31개의 단계별 강의 · 코드 실습 · GitHub 원본 소스 분석">
+<title>Rust Learning Lab — Java에서 실전 Rust까지</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230b1222'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='35' fill='%2385e6cc'%3ER%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="sidebar" id="sidebar" aria-label="학습 목차">
+    <a class="brand" href="#/home">
+      <span class="brand-icon">R<span>·</span></span>
+      <span class="brand-text"><strong>Rust Learning Lab</strong><small>JAVA → RUST · PROJECT LEARNING</small></span>
+    </a>
+    <div class="side-section">
+      <div class="label">학습 탐색</div>
+      <label class="search-box">
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
+        <input id="lesson-search" type="search" placeholder="주제 또는 코드 검색" autocomplete="off" aria-label="강의 검색">
+        <kbd>/</kbd>
+      </label>
+    </div>
+    <nav class="quick-links" aria-label="주 메뉴">
+      <a href="#/home" data-nav="home"><span class="quick-icon">⌂</span> 대시보드</a>
+      <a href="#/lab" data-nav="lab"><span class="quick-icon">▧</span> 확률 실험실</a>
+      <a href="#/source" data-nav="source"><span class="quick-icon">⌘</span> 원본 코드 탐험</a>
+      <a href="#/resources" data-nav="resources"><span class="quick-icon">≡</span> 학습 자료 · 설치</a>
+    </nav>
+    <div class="side-section curriculum">
+      <div class="curriculum-heading"><span class="label">전체 커리큘럼</span><span id="side-count">0/31</span></div>
+      <div id="course-outline"></div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="progress-label"><span>나의 학습 진행률</span><strong id="sidebar-pct">0%</strong></div>
+      <div class="progress-track"><div id="sidebar-progress" class="progress-fill" style="width:0%"></div></div>
+      <p>진도는 현재 브라우저에만 저장됩니다.</p>
+      <a class="side-source" href="https://github.com/P-JSL/gacha_pickup_calculator" target="_blank" rel="noopener noreferrer">↗ 원본 계산기 GitHub</a>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-button" id="menu-toggle" aria-label="학습 목차 열기" aria-expanded="false">☰</button>
+        <div class="breadcrumbs" id="breadcrumbs">LEARNING / OVERVIEW</div>
+      </div>
+      <div class="topbar-right">
+        <span class="source-version" title="코드 기준 버전">SOURCE v0.2.4</span>
+        <button class="theme-button" id="theme-toggle" aria-label="라이트·다크 테마 전환" title="테마 전환">◐</button>
+        <a class="top-github" href="https://github.com/P-JSL/gacha_pickup_calculator" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </div>
+    </header>
+    <main id="main" class="main" tabindex="-1" aria-live="polite"></main>
+    <footer class="footer">
+      <span>Rust Learning Lab · Gacha Pickup Calculator 학습용 사이트</span>
+      <span>무료 · 로그인 없음 · 브라우저 로컬 저장</span>
+    </footer>
+  </div>
+</div>
+<div class="mobile-scrim" id="mobile-scrim" aria-hidden="true"></div>
+<div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
+<script src="./lessons.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
