@@ -184,3 +184,31 @@ function sharedRelease(key, fetchRelease) {
 - **확인 근거:** [admin/studio.js L142-L167](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/admin/studio.js#L142-L167)는 site-pages.json의 SHA를 PUT에 넣어 경쟁 수정을 감지하며, ZIP 25 MiB 제한과 파일별 SHA를 사용합니다.
 - **개선 절차:** 두 브라우저가 동시에 다른 블록을 편집하여 순차 저장할 때 두 번째 요청의 충돌 및 사용자 메시지를 검증합니다. 관리자가 재로그인·새로고침 후 변경 사항을 비교·재적용하는 절차를 문서화하고, 만료 토큰·403·409/422·네트워크 중단·업로드 25 MiB 경계를 테스트합니다. 충돌을 피하려고 최신 SHA만 새로 받아 **무조건 덮어쓰는 자동 재시도는 금지**합니다.
 - **수용 조건:** 기존 메뉴·다운로드 링크·토큰 비저장 특성 유지, 분기 충돌 시 변경 소실 없음, ZIP 실패 후 불완전한 다운로드 별칭이 게시되지 않음.
+
+## 6.7 정적 웹·GitHub API·DOM의 추가 속도 개선 여력 — 2단계 반복 검토 (2026-11-11)
+
+### 추가 개선 후보 (정적 사이트 범위)
+
+| 단계 | 실제 근거 | 적용 가능한 속도 최적화 | 현재 개선량 |
+|---|---|---|---|
+| 최신 Release 검색 | [assets/site-pages.js L180-L223](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/assets/site-pages.js#L180-L223) | 동일 저장소·동일 태그에 대한 동시 fetch를 **in-flight Promise 하나**로 공유, 403/404/429 실패·갱신 캐시 무효화 분리 | 동일 요청 3개를 하나로 합치면 호출 수만 **3→1**, 전체 페이지가 3배 빨라진다는 뜻 아님 |
+| 페이지 데이터 | [assets/site-pages.js L374-L423](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/assets/site-pages.js#L374-L423) | 현재 lifecycle에서 동일 JSON 중복 fetch가 발생할 때만 공유·재파싱 제거 | 첫 방문의 네트워크 RTT·전송시간은 제거 불가 |
+| 관리자 입력 | [admin/studio.js L59-L85](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/admin/studio.js#L59-L85) | 매 문자 입력 전체 canvas/preview replaceChildren 대신 변경된 블록을 선택적으로 렌더, frame당 1회로 묶기 | 블록 수 B가 클 때 전체 O(B) DOM 재생성 → 일정 크기 블록의 O(1) 갱신 가능; B≤60, 실제 절감 ms 미측정 |
+| 차트 갱신 | [assets/download-chart.js L180-L244](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/assets/download-chart.js#L180-L244) | 동일 snapshot에 대한 반복 geometry/DOM 구성 회피 | 차트가 초기 critical path 밖이면 페이지 LCP 개선 거의 없음 |
+| Actions 통계 | [.github/scripts/collect_download_stats.py](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/.github/scripts/collect_download_stats.py) | 이미 저장소별 Release 조회 공유 구현; conditional GET를 적용하기 전 호출/바이트 절감 실측 | CI 통계 시간과 방문자의 페이지 로드 시간은 다른 지표 |
+
+**한계:** URL·정적 JSON 필수 다운로드는 **최소 1회 RTT + B/네트워크 대역폭**의 시간 하한이 있습니다. React로 옮기거나 Web Worker를 도입하는 것 자체는 추가 가속의 근거가 없습니다. Release URL이 바뀌는 동안 캐시가 오래된 ZIP을 최신처럼 표시하면 성능보다 정확성이 훼손됩니다.
+
+**실험:** Chrome Network/Performance에서 cold/warm 5회, 4x CPU throttle, 모바일 대역폭, 관리 블록 1/20/60개 × 키 입력 100회. 측정값은 API 요청 수, 초기 표시/LCP, render long task, input p95, JS heap, DOM nodes를 별도로 기록합니다. **현행 대비 추가 성능 향상 배수: 미측정**.
+
+### 논문·수학 모델에 따른 추가 개선 상한
+
+**Amdahl:** 전체 기존 시간 중 최적화할 단계 비율 f, 해당 단계 가속 r이면 전체 S=1/(1−f+f/r). 가령 f=0.10/r=4 → S=1.081배(전체 시간 7.5% 단축), f=0.50/r=4 → 1.600배(37.5% 단축), f=0.80/r=4 → 2.500배(60% 단축). **위 수치는 측정 결과도 개선 약속도 아닌 계산 예시**입니다. 실측 f가 없으면 저장소 전체의 추가 가능 배수는 제시할 수 없습니다. 여러 단계 국소 개선 배수를 곱하면 안 됩니다.
+
+**Roofline:** CPU 작업량뿐 아니라 메모리/디스크/네트워크 트래픽이 병목일 수 있습니다. **Little:** 안정된 작업계에서 동시 작업수 L=요청 도착률 λ×평균 체류시간 W이며, 작업자 수의 무조건적인 증가는 RAM·대기열과 p95를 악화시킬 수 있습니다. 최소 5회 동일 입력·동일 장비에서 E2E wall time·단계별 CPU·peak RSS·읽기/쓰기 bytes·처리량·p50/p95를 모두 관측합니다. 벤치마크 기록이 없는 개선률은 **미측정**입니다.
+
+검증된 1차 문헌: [Amdahl (1967)](https://doi.org/10.1145/1465482.1465560), [Roofline (2009)](https://zenodo.org/records/1236156), [Little (1961)](https://doi.org/10.1287/opre.9.3.383), [Dean & Barroso (2013), The Tail at Scale](https://research.google/pubs/the-tail-at-scale/), [Google Benchmark Guide](https://google.github.io/benchmark/user_guide.html). 논문에 기재된 **다른 시스템의 가속 배수**는 이 프로그램에서 실현 가능한 개선치로 옮겨 적지 않습니다.
+
+### 재검토 방법과 수행 범위
+
+**1차 100회**는 기존 코드/벤치마크 기반 후보·명령·향상률 주장·복잡도 경계를 다른 입력 크기·작업자 수·병목 구성 조건으로 반복 검산한 **정적·수치 검토**입니다. **2차 100회**는 1차 문헌을 반영해 Amdahl, Roofline, Little 및 동일 성능 단위 기준을 서로 다른 모형 파라미터로 교차 검산한 **학술·수학적 정합성 검토**입니다. 이는 각 문서에 별도로 시행한 100+100 반복 라운드입니다. **200번의 독립적인 전 코드 정독, 실기 벤치마크 200회, 논문 전체 실험 재현을 의미하지 않습니다.** 실제 추가 개선율은 코드 수정 전후의 재현 가능한 성능 시험 없이는 확정할 수 없습니다.
