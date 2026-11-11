@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "captured_at": "2026-11-10T09:56:23Z",
+  "captured_at": "2026-11-11T09:29:32Z",
   "timezone": "Asia/Seoul",
   "source": "GitHub Releases REST API: assets[].download_count",
   "series": [
@@ -61,7 +61,7 @@
       "filename": "SyousetuTranslate-Web-Windows-x86.zip",
       "assetPrefix": "SyousetuTranslate",
       "source": "release",
-      "total": 19,
+      "total": 20,
       "status": "available"
     },
     {
@@ -71,7 +71,7 @@
       "filename": "gacha_pickup_calculator.exe",
       "assetPrefix": "",
       "source": "release",
-      "total": 51,
+      "total": 52,
       "status": "available"
     },
     {
@@ -161,6 +161,19 @@
         "home:tools-jeus-rust": 11,
         "home:tools-novel-rust": 19,
         "home:gacha-pickup-calculator-windows": 51,
+        "video-extension-local": null
+      }
+    },
+    {
+      "date": "2026-11-11",
+      "counts": {
+        "video-desktop": 7,
+        "home:folderorganizer-rust": 13,
+        "home:bmvqolwnrrm46g5": 39,
+        "home:tools-jeus-go": 3,
+        "home:tools-jeus-rust": 11,
+        "home:tools-novel-rust": 20,
+        "home:gacha-pickup-calculator-windows": 52,
         "video-extension-local": null
       }
     }
