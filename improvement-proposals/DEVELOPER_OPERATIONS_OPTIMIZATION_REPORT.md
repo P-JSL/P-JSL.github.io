@@ -161,3 +161,26 @@ function sharedRelease(key, fetchRelease) {
 5. 문제가 있으면 해당 커밋만 되돌려 정적 사이트를 다시 배포합니다. 관리자 저장 내용(`site-pages.json`)을 덮어쓰는 원복은 금지.
 
 **수용 조건:** 원래 페이지 블록/다운로드 URL/관리자 JSON이 동일하고, 토큰이 브라우저 저장소나 공개 JS에 남지 않으며, 수치로 입증 가능한 API 호출·렌더 감소가 있어야 합니다.
+
+
+## 6.6 추가 보완 과제 — 게시 계약·통계 신선도·관리자 변경 안전성 (2026-11-11)
+
+기존 IMP-P01~P04는 API·DOM 호출 비용 중심입니다. 실제 운영 품질을 위해 **잘못된 다운로드 안내 자동 탐지**, **통계 수치의 신선도 표현**, **동시 수정 충돌 복구 절차**를 독립 관리합니다.
+
+### IMP-P05 · 구성 JSON의 Release 자산 정합성 CI 도입 (P1 운영)
+
+- **확인 근거:** [site-pages.json](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/site-pages.json)의 tools-novel-rust 블록은 Windows x86 및 SyousetuTranslate-Web-Windows-x86.zip을 안내하지만, 분석 시 확인된 실제 정식 릴리스는 Windows x64 자산이었습니다. 최신 자산 prefix 해석은 [assets/site-pages.js L180-L200](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/assets/site-pages.js#L180-L200)에 구현되어 있어 단순 다운로드 실패와 **표시 메타데이터 오류**를 구분해야 합니다.
+- **개선 절차:** ① site-pages.json의 releaseRepo·releaseTag·filename·assetPrefix를 읽는 read-only 검사 스크립트를 설계합니다. ② GitHub Releases API에서 정확히 1개의 최신 업로드 ZIP/EXE가 매칭되는지, 표시 architecture(x86/x64)와 파일명이 일치하는지 확인합니다. ③ API 403/429/일시 실패는 불일치 확정이 아닌 재검증 필요 상태로 처리합니다. ④ JSON 실제 수정은 보고서 변경과 별개 PR에서 진행합니다.
+- **검증/원복:** [pages.yml L38-L43](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/.github/workflows/pages.yml#L38-L43)의 기존 Rust Lab 검사와 다운로드 ZIP 준비가 계속 성공해야 하며, Release가 아직 없는 제품은 명시된 미게시 상태로 표시합니다.
+
+### IMP-P06 · 통계 스냅샷 마지막 갱신 시각과 집계 범위를 명시 (P2)
+
+- **확인 근거:** [download-stats.yml L11-L13](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/.github/workflows/download-stats.yml#L11-L13)은 하루 1회 예약입니다. [collect_download_stats.py L102-L119, L145-L175](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/.github/scripts/collect_download_stats.py#L102-L119)는 누적 Release 자산 다운로드 수를 집계하고 실패 시 유효했던 일별 값을 보존합니다.
+- **개선 절차:** 통계 화면에 **집계 출처: GitHub Releases**, 마지막 성공 스냅샷 시각, 일시 실패/미게시 상태 및 Pages /downloads 직링크가 포함되지 않는다는 설명을 동시에 노출합니다. 기준 시간은 스냅샷 원문 필드를 사용하고, 파일 수정 시간이나 브라우저 시각을 임의의 최종 성공 시각으로 사용하지 않습니다.
+- **수용 조건:** API 장애/Actions 지연/미게시/캐시 상태에서 오래된 숫자를 실시간 수치처럼 표시하지 않으며, 24시간 이상 갱신 실패 시 운영자가 Actions와 최근 커밋을 확인하도록 합니다. 추가 API 실시간 폴링으로 무료 API 한도를 소모하지 않습니다.
+
+### IMP-P07 · 관리자 덮어쓰기·동시 편집·대용량 ZIP 실패 리허설 (P2)
+
+- **확인 근거:** [admin/studio.js L142-L167](https://github.com/P-JSL/P-JSL.github.io/blob/8b3ac9e473daec0ff304032351452331879c1c0c/admin/studio.js#L142-L167)는 site-pages.json의 SHA를 PUT에 넣어 경쟁 수정을 감지하며, ZIP 25 MiB 제한과 파일별 SHA를 사용합니다.
+- **개선 절차:** 두 브라우저가 동시에 다른 블록을 편집하여 순차 저장할 때 두 번째 요청의 충돌 및 사용자 메시지를 검증합니다. 관리자가 재로그인·새로고침 후 변경 사항을 비교·재적용하는 절차를 문서화하고, 만료 토큰·403·409/422·네트워크 중단·업로드 25 MiB 경계를 테스트합니다. 충돌을 피하려고 최신 SHA만 새로 받아 **무조건 덮어쓰는 자동 재시도는 금지**합니다.
+- **수용 조건:** 기존 메뉴·다운로드 링크·토큰 비저장 특성 유지, 분기 충돌 시 변경 소실 없음, ZIP 실패 후 불완전한 다운로드 별칭이 게시되지 않음.
