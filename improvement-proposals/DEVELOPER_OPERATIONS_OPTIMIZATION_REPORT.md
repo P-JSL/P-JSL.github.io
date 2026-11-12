@@ -267,3 +267,59 @@ Amdahl의 법칙 `S=1/(1-f+f/r)`에서 **전체 시간 중 대상 hot path의 �
 **연구 범위:** HTTP caching은 데이터 정합성·신선도를 유지하는 범위 내에서만 적용하며, static hosting에서 서버 CPU 배수를 임의로 제시하지 않습니다.
 
 ---
+
+## 6.9 DIVERSE PERFORMANCE REVIEW — 1,000 feasibility + 1,000 cross-disciplinary evaluations (2026-11-12)
+
+### Scope and how the 1,000 rounds were actually run
+
+This is a **new method-diversity audit**, not 1,000 new optimizations. A reproducible Python scenario engine evaluated **10 distinct code-anchored alternatives × 10 workloads × 10 independent constraints = 1,000 feasibility cases**, and a second **10 alternatives × 10 workloads × 10 different research/theory lenses = 1,000 cross-disciplinary cases**, for **2,000 evaluated tuples per repository**. Across six repositories: 12,000 evaluated tuples. Each phase used distinct tuple keys, regenerated a stable SHA-256 and passed uniqueness/assertion checks; repeating the script gave the same summary SHA-256. `run_diverse_1000.py` SHA-256 `caecadb0696142bca8de43e1ae440152015459e8e90e8c418e9909c8a1b82de9`, `summary_6repos.json` SHA-256 `23e3ab0a3a456c954dc7f42a0df115dd9ad26fb81b6aa73c4b74850121fd98d0`.
+
+Crucial limitation: these are **automatic engineering-model evaluations over synthetic scenario parameters**, not 2,000 independent human deep reviews, 2,000 actual code executions, 2,000 program benchmarks, or independent proofs that the alternatives will be faster. The linked existing files were checked against the repository tree. **No candidate speedup is measured or guaranteed.** A "prototype" label only means a plausible experiment subject to correctness gates.
+
+10 workload families include cold start, warm small data, medium, million-item, repeated operations, high RTT, memory pressure, UI churn, slow disk and oversubscribed workloads. The 10 feasibility dimensions are exact-output parity, no new dependency, cross-platform support, bounded memory, tail latency, cold start, cancellation, crash recovery, throughput and I/O overhead.
+
+### Ten **different** research lenses (not another Amdahl/Roofline/Little loop)
+
+1. [Work stealing / dependency span](https://doi.org/10.1145/324133.324234)
+2. [Cache-oblivious memory hierarchy](https://www.fftw.org/~athena/abstracts/abstract12.html)
+3. [Bloom negative-prefilter tradeoff](https://doi.org/10.1145/362686.362692)
+4. [Roaring compressed bitmap indexes](https://doi.org/10.1002/spe.2402)
+5. [Boyer–Moore substring search](https://doi.org/10.1145/359842.359859)
+6. [Common random numbers for controlled comparisons](https://doi.org/10.1287/mnsc.41.12.1935)
+7. [HTTP strong Range validators / RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html)
+8. [Top-Down microarchitectural stalls](https://doi.org/10.1109/ISPASS.2014.6844459)
+9. [INP interaction responsiveness](https://web.dev/articles/inp)
+
+We evaluated theoretical **relevance**, not automatic applicability. In particular Bloom (only safe as a negative prefilter), Roaring (posting density), string search and web INP are marked **not-relevant** when a method does not involve those resources. Amortization tests the break-even condition *repeats × saved cost > one-time setup*; work/span bounds parallel tasks; cache models distinguish L1/L2 traffic from total FLOPs; BDP = RTT × goodput informs stream window sizing; paired random numbers reduce **benchmark-estimator variance**, not runtime. These models are not interchangeable or universal optimization formulas.
+
+### Audited outcomes: methodological screening, not runtime pass rates
+
+| Phase (1,000 distinct cases each) | Result distribution | Interpretation |
+|---|---|---|
+| Feasibility | prototype-after-profiling 159; conditional-prototype 435; guard-required 54; low-priority 243; measure-first 9; reject-contract-change 100; existing-not-additional 0 | A scenario may be a good experiment, **not an implemented optimization** |
+| Research lenses | useful 160; indirect 460; not-relevant 380 | Marks applicability of a mathematical viewpoint, **not observed wins** |
+
+Feasibility SHA-256: `b731485d7a9bfa7005c7235bcda77cdeb440ac2db20cc5c13a666049e8c02821`. Research-lens SHA-256: `7eeaef843ad730d544cecf12ac965e10d12d3ae9de906189d7e9f42b38711f1c`. These hashes cover the generated 1,000-row canonical JSON arrays for the given repository. Machine-readable details are supplied in the separately delivered evidence ZIP, **not committed to this repository**.
+
+### Ten concrete alternatives, feasibility conditions and counterexamples
+
+| ID | Alternative | Verified existing source anchor | Assessment | Only meaningful when | Rejection / regression gate |
+|---|---|---|---|---|---|
+| P-ALT-01 | Identical Release request dedup | [`assets/site-pages.js`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/assets/site-pages.js) | **Prototype after profiling** | Several blocks resolve same repo/tag at same time | Avoid stale or cross-version shared Promise |
+| P-ALT-02 | Short-lived Release metadata cache | [`assets/site-pages.js`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/assets/site-pages.js) | **Conditional** | Same navigation repeats before data expires | Must not advertise outdated latest download |
+| P-ALT-03 | Partial admin canvas updates | [`admin/studio.js`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/admin/studio.js) | **Prototype after profiling** | Many blocks and typing causes full render/replaceChildren | IME, focus, undo, drag-and-drop contracts |
+| P-ALT-04 | Coalesce preview frames | [`admin/studio.js`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/admin/studio.js) | **Conditional** | Multiple UI updates per animation frame | RAF scheduling may delay immediate feedback |
+| P-ALT-05 | Lazy statistics rendering | [`assets/download-chart.js`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/assets/download-chart.js) | **Prototype after profiling** | Chart below fold with heavy first paint | If initially visible, lazy chart can worsen UX |
+| P-ALT-06 | Aggregate stats API work | [`.github/scripts/collect_download_stats.py`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/.github/scripts/collect_download_stats.py) | **Conditional; repository-level reuse exists** | Repeated Release pagination on scheduled Actions | CI duration ≠ visitor LCP |
+| P-ALT-07 | JSON loading and parse memo | [`assets/site-pages.js`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/assets/site-pages.js) | **Conditional** | Same JSON loaded repeatedly within navigation lifecycle | Current no-store may be freshness requirement |
+| P-ALT-08 | CSS layout/recalc optimization | [`assets/site-pages.css`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/assets/site-pages.css) | **Prototype after profiling** | DevTools shows layout/recalc long tasks | Theme visual parity and CLS |
+| P-ALT-09 | Prioritize critical images | [`assets/site-pages.js`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/assets/site-pages.js) | **Conditional** | Measured LCP image and avoidable below-fold bytes | Blind lazy-load of hero worsens LCP |
+| P-ALT-10 | Prefetch all releases concurrently | [`assets/site-pages.js`](https://github.com/P-JSL/P-JSL.github.io/blob/7e5ed8f49db306e3307e7175a10ab0bfa2807728/assets/site-pages.js) | **Reject under current constraints** | Only if tiny bounded high-confidence required subset exists | Unbounded GitHub API fan-out may slow page and hit 403/429 |
+
+### Decisions for the next experimental optimization cycle
+
+**First experiments:** (1) correlate DevTools waterfall with actual repeated Release calls and critical-path waits; (2) measure admin input-to-next-paint (INP-style) for 1/20/60 blocks, including Korean IME; (3) measure chart time to visible content vs initial page LCP. Request-count savings are **not** elapsed-time savings if those requests already overlap. This static-site architecture offers no server-side DB parallelism knob. Network freshness is a functional constraint.
+
+Relevant new research perspective: Web.dev INP (browser field interaction), RFC 9110 cache/range semantics, amortized revalidation, cache hierarchy/DOM churn, Top-Down measurement as CPU-model analogy (not a measured PMU result).
+
+**Go/no-go before implementation:** collect source/benchmark SHA, build flags, hardware, workload sizes, current E2E wall-time and step breakdown (including p50/p95), CPU cycles, peak RSS/JS heap, I/O bytes, and strict result parity. Run baseline and candidate in randomized alternating order, minimum five complete runs each; preserve all existing public interfaces, persistence semantics and output contracts. A reduction in operation count or a theoretical upper bound **does not prove any whole-program speedup**.
