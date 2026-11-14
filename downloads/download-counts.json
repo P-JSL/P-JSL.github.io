@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "updated_at": "2026-11-13T09:36:33Z",
+  "updated_at": "2026-11-14T09:01:23Z",
   "metric": "Published GitHub Release ZIP/EXE asset download_count (all stable versions)",
   "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
   "counts": {
     "video-desktop": 7,
-    "home:folderorganizer-rust": 13,
-    "home:bmvqolwnrrm46g5": 39,
+    "home:folderorganizer-rust": 14,
+    "home:bmvqolwnrrm46g5": 41,
     "home:tools-jeus-go": 3,
     "home:tools-jeus-rust": 11,
     "home:tools-novel-rust": 20,
-    "home:gacha-pickup-calculator-windows": 53,
+    "home:gacha-pickup-calculator-windows": 54,
     "video-extension-local": null
   },
   "items": [
@@ -26,14 +26,14 @@
       "label": "Folder Organizer · Rust",
       "source": "release",
       "status": "available",
-      "count": 13
+      "count": 14
     },
     {
       "id": "home:bmvqolwnrrm46g5",
       "label": "Folder Organizer · Python",
       "source": "release",
       "status": "available",
-      "count": 39
+      "count": 41
     },
     {
       "id": "home:tools-jeus-go",
@@ -61,7 +61,7 @@
       "label": "Gacha Pickup Calculator · Windows",
       "source": "release",
       "status": "available",
-      "count": 53
+      "count": 54
     },
     {
       "id": "video-extension-local",

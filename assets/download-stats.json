@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "captured_at": "2026-11-13T09:36:33Z",
+  "captured_at": "2026-11-14T09:01:23Z",
   "timezone": "Asia/Seoul",
   "source": "GitHub Releases REST API: assets[].download_count",
   "series": [
@@ -21,7 +21,7 @@
       "filename": "FolderOrganizer-Rust-Windows-x64.zip",
       "assetPrefix": "",
       "source": "release",
-      "total": 13,
+      "total": 14,
       "status": "available"
     },
     {
@@ -31,7 +31,7 @@
       "filename": "FolderOrganizer-Windows-x64.zip",
       "assetPrefix": "",
       "source": "release",
-      "total": 39,
+      "total": 41,
       "status": "available"
     },
     {
@@ -71,7 +71,7 @@
       "filename": "gacha_pickup_calculator.exe",
       "assetPrefix": "",
       "source": "release",
-      "total": 53,
+      "total": 54,
       "status": "available"
     },
     {
@@ -200,6 +200,19 @@
         "home:tools-jeus-rust": 11,
         "home:tools-novel-rust": 20,
         "home:gacha-pickup-calculator-windows": 53,
+        "video-extension-local": null
+      }
+    },
+    {
+      "date": "2026-11-14",
+      "counts": {
+        "video-desktop": 7,
+        "home:folderorganizer-rust": 14,
+        "home:bmvqolwnrrm46g5": 41,
+        "home:tools-jeus-go": 3,
+        "home:tools-jeus-rust": 11,
+        "home:tools-novel-rust": 20,
+        "home:gacha-pickup-calculator-windows": 54,
         "video-extension-local": null
       }
     }
