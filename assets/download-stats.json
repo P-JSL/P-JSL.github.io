@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "captured_at": "2026-11-14T09:01:23Z",
+  "captured_at": "2026-11-15T09:30:39Z",
   "timezone": "Asia/Seoul",
   "source": "GitHub Releases REST API: assets[].download_count",
   "series": [
@@ -71,7 +71,7 @@
       "filename": "gacha_pickup_calculator.exe",
       "assetPrefix": "",
       "source": "release",
-      "total": 54,
+      "total": 55,
       "status": "available"
     },
     {
@@ -213,6 +213,19 @@
         "home:tools-jeus-rust": 11,
         "home:tools-novel-rust": 20,
         "home:gacha-pickup-calculator-windows": 54,
+        "video-extension-local": null
+      }
+    },
+    {
+      "date": "2026-11-15",
+      "counts": {
+        "video-desktop": 7,
+        "home:folderorganizer-rust": 14,
+        "home:bmvqolwnrrm46g5": 41,
+        "home:tools-jeus-go": 3,
+        "home:tools-jeus-rust": 11,
+        "home:tools-novel-rust": 20,
+        "home:gacha-pickup-calculator-windows": 55,
         "video-extension-local": null
       }
     }
