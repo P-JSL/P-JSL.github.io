@@ -1,15 +1,15 @@
 {
   "schema": 1,
-  "updated_at": "2026-11-15T09:30:39Z",
+  "updated_at": "2026-11-16T09:49:48Z",
   "metric": "Published GitHub Release ZIP/EXE asset download_count (all stable versions)",
   "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
   "counts": {
     "video-desktop": 7,
-    "home:folderorganizer-rust": 14,
+    "home:folderorganizer-rust": 15,
     "home:bmvqolwnrrm46g5": 41,
     "home:tools-jeus-go": 3,
     "home:tools-jeus-rust": 11,
-    "home:tools-novel-rust": 20,
+    "home:tools-novel-rust": 21,
     "home:gacha-pickup-calculator-windows": 55,
     "video-extension-local": null
   },
@@ -26,7 +26,7 @@
       "label": "Folder Organizer · Rust",
       "source": "release",
       "status": "available",
-      "count": 14
+      "count": 15
     },
     {
       "id": "home:bmvqolwnrrm46g5",
@@ -54,7 +54,7 @@
       "label": "Syousetu Translate · Rust",
       "source": "release",
       "status": "available",
-      "count": 20
+      "count": 21
     },
     {
       "id": "home:gacha-pickup-calculator-windows",

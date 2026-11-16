@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "captured_at": "2026-11-15T09:30:39Z",
+  "captured_at": "2026-11-16T09:49:48Z",
   "timezone": "Asia/Seoul",
   "source": "GitHub Releases REST API: assets[].download_count",
   "series": [
@@ -21,7 +21,7 @@
       "filename": "FolderOrganizer-Rust-Windows-x64.zip",
       "assetPrefix": "",
       "source": "release",
-      "total": 14,
+      "total": 15,
       "status": "available"
     },
     {
@@ -61,7 +61,7 @@
       "filename": "SyousetuTranslate-Web-Windows-x86.zip",
       "assetPrefix": "SyousetuTranslate",
       "source": "release",
-      "total": 20,
+      "total": 21,
       "status": "available"
     },
     {
@@ -225,6 +225,19 @@
         "home:tools-jeus-go": 3,
         "home:tools-jeus-rust": 11,
         "home:tools-novel-rust": 20,
+        "home:gacha-pickup-calculator-windows": 55,
+        "video-extension-local": null
+      }
+    },
+    {
+      "date": "2026-11-16",
+      "counts": {
+        "video-desktop": 7,
+        "home:folderorganizer-rust": 15,
+        "home:bmvqolwnrrm46g5": 41,
+        "home:tools-jeus-go": 3,
+        "home:tools-jeus-rust": 11,
+        "home:tools-novel-rust": 21,
         "home:gacha-pickup-calculator-windows": 55,
         "video-extension-local": null
       }
