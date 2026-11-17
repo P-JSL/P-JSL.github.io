@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "updated_at": "2026-11-16T09:49:48Z",
+  "updated_at": "2026-11-17T10:47:33Z",
   "metric": "Published GitHub Release ZIP/EXE asset download_count (all stable versions)",
   "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
   "counts": {
     "video-desktop": 7,
-    "home:folderorganizer-rust": 15,
-    "home:bmvqolwnrrm46g5": 41,
+    "home:folderorganizer-rust": 22,
+    "home:bmvqolwnrrm46g5": 45,
     "home:tools-jeus-go": 3,
     "home:tools-jeus-rust": 11,
     "home:tools-novel-rust": 21,
@@ -26,14 +26,14 @@
       "label": "Folder Organizer · Rust",
       "source": "release",
       "status": "available",
-      "count": 15
+      "count": 22
     },
     {
       "id": "home:bmvqolwnrrm46g5",
       "label": "Folder Organizer · Python",
       "source": "release",
       "status": "available",
-      "count": 41
+      "count": 45
     },
     {
       "id": "home:tools-jeus-go",
