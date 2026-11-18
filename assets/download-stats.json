@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "captured_at": "2026-11-17T10:47:33Z",
+  "captured_at": "2026-11-18T10:14:31Z",
   "timezone": "Asia/Seoul",
   "source": "GitHub Releases REST API: assets[].download_count",
   "series": [
@@ -61,7 +61,7 @@
       "filename": "SyousetuTranslate-Web-Windows-x86.zip",
       "assetPrefix": "SyousetuTranslate",
       "source": "release",
-      "total": 21,
+      "total": 23,
       "status": "available"
     },
     {
@@ -251,6 +251,19 @@
         "home:tools-jeus-go": 3,
         "home:tools-jeus-rust": 11,
         "home:tools-novel-rust": 21,
+        "home:gacha-pickup-calculator-windows": 55,
+        "video-extension-local": null
+      }
+    },
+    {
+      "date": "2026-11-18",
+      "counts": {
+        "video-desktop": 7,
+        "home:folderorganizer-rust": 22,
+        "home:bmvqolwnrrm46g5": 45,
+        "home:tools-jeus-go": 3,
+        "home:tools-jeus-rust": 11,
+        "home:tools-novel-rust": 23,
         "home:gacha-pickup-calculator-windows": 55,
         "video-extension-local": null
       }
