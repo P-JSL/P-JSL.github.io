@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-11-18T10:14:31Z",
+  "updated_at": "2026-11-19T10:25:07Z",
   "metric": "Published GitHub Release ZIP/EXE asset download_count (all stable versions)",
   "refresh": "scheduled GitHub Actions, four times per day; no per-click writes",
   "counts": {
@@ -9,7 +9,7 @@
     "home:bmvqolwnrrm46g5": 45,
     "home:tools-jeus-go": 3,
     "home:tools-jeus-rust": 11,
-    "home:tools-novel-rust": 23,
+    "home:tools-novel-rust": 24,
     "home:gacha-pickup-calculator-windows": 55,
     "video-extension-local": null
   },
@@ -54,7 +54,7 @@
       "label": "Syousetu Translate · Rust",
       "source": "release",
       "status": "available",
-      "count": 23
+      "count": 24
     },
     {
       "id": "home:gacha-pickup-calculator-windows",
