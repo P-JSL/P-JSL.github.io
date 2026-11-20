@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "captured_at": "2026-11-19T10:25:07Z",
+  "captured_at": "2026-11-20T10:05:39Z",
   "timezone": "Asia/Seoul",
   "source": "GitHub Releases REST API: assets[].download_count",
   "series": [
@@ -270,6 +270,19 @@
     },
     {
       "date": "2026-11-19",
+      "counts": {
+        "video-desktop": 7,
+        "home:folderorganizer-rust": 22,
+        "home:bmvqolwnrrm46g5": 45,
+        "home:tools-jeus-go": 3,
+        "home:tools-jeus-rust": 11,
+        "home:tools-novel-rust": 24,
+        "home:gacha-pickup-calculator-windows": 55,
+        "video-extension-local": null
+      }
+    },
+    {
+      "date": "2026-11-20",
       "counts": {
         "video-desktop": 7,
         "home:folderorganizer-rust": 22,
